@@ -1,0 +1,19 @@
+[Desktop Entry]
+Type=Application
+Name=Glint
+Name[zh_CN]=Glint 截图
+Comment=Screenshot, annotate and pin
+Comment[zh_CN]=截图、标注与贴图
+Exec=@GLINT@ capture
+Icon=io.github.glint.Glint
+Terminal=false
+Categories=Utility;Graphics;
+Keywords=screenshot;snip;pin;截图;贴图;
+StartupNotify=false
+X-GNOME-UsesNotifications=true
+Actions=pin;
+
+[Desktop Action pin]
+Name=Pin clipboard
+Name[zh_CN]=贴图
+Exec=@GLINT@ pin

@@ -1,0 +1,10 @@
+{
+  "uuid": "glint@chenwu.local",
+  "name": "Glint",
+  "description": "Instant screenshots with annotation and pinning. Captures inside GNOME Shell, so menus and popups stay in the shot.",
+  "shell-version": ["50"],
+  "settings-schema": "org.gnome.shell.extensions.glint",
+  "version": 5,
+  "version-name": "1.2.1",
+  "contact-email": "geekchenwu@gmail.com"
+}

@@ -1,0 +1,27 @@
+# Build output and Python caches
+/dist/
+/build/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+gschemas.compiled
+
+# Local configuration and diagnostics
+.env
+.env.*
+!.env.example
+*.log
+*.swp
+*~
+.DS_Store
+.idea/
+.vscode/
+
+# Keep only the current, reviewed product screenshots in source control.
+/screenshots/*.png
+!/screenshots/logo-orange.png
+!/screenshots/selection-orange.png
+!/screenshots/about-orange.png

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.glint.Glint</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.glint">
+    <name>chenwu</name>
+  </developer>
+  <update_contact>geekchenwu@gmail.com</update_contact>
+  <name>Glint</name>
+  <name xml:lang="zh_CN">Glint 截图</name>
+  <summary>Instant screenshots, annotation and pinning for GNOME</summary>
+  <summary xml:lang="zh_CN">GNOME 上的即时截图、标注与贴图</summary>
+  <description>
+    <p>
+      Glint captures from inside GNOME Shell the moment you press F1, so there is no
+      start-up delay and open menus, popups and tooltips stay in the shot.
+    </p>
+    <p xml:lang="zh_CN">
+      Glint 在按下 F1 的瞬间从 GNOME Shell 内部截取画面，没有启动延迟，打开的菜单、弹窗和提示都能截到。
+    </p>
+    <ul>
+      <li>Window, menu and panel auto-detection with a pixel loupe and colour picker</li>
+      <li>Rectangle, ellipse, arrow, line, pen, marker, text, mosaic and step markers</li>
+      <li>Pin captures or clipboard contents on top of every window; zoom and fade them</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.glint.Glint.desktop</launchable>
+  <categories>
+    <category>Utility</category>
+    <category>Graphics</category>
+  </categories>
+  <keywords>
+    <keyword>screenshot</keyword>
+    <keyword>snip</keyword>
+    <keyword>pin</keyword>
+    <keyword xml:lang="zh_CN">截图</keyword>
+    <keyword xml:lang="zh_CN">贴图</keyword>
+  </keywords>
+  <provides>
+    <binary>glint</binary>
+  </provides>
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="1.2.1" date="2026-10-26">
+      <description>
+        <p>Introduce an orange crop-frame G icon and warm orange selection controls. Add author email, mail launch and copy actions to preferences.</p>
+      </description>
+    </release>
+    <release version="1.2.0" date="2026-10-26">
+      <description>
+        <p>Install required dependencies automatically with the bundled installer. Start capturing immediately after installation through the system screenshot portal, with temporary shortcuts until the GNOME extension loads.</p>
+      </description>
+    </release>
+    <release version="1.1.1" date="2026-10-26">
+      <description>
+        <p>Fix pasting screenshots into other applications, speed up high-resolution capture with parallel lossless encoding, and center the indicator menu.</p>
+      </description>
+    </release>
+    <release version="1.1.0" date="2026-10-26">
+      <description>
+        <p>Snipaste-style selection frame: drag anywhere outside the selection to move its nearest edges, keep adjusting it while annotating, and fine-tune it from the keyboard.</p>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-10-26">
+      <description>
+        <p>First release.</p>
+      </description>
+    </release>
+  </releases>
+</component>

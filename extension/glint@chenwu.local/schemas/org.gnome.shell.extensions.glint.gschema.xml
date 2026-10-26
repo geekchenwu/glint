@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.glint" path="/org/gnome/shell/extensions/glint/">
+    <key name="capture" type="as">
+      <default><![CDATA[['F1']]]></default>
+      <summary>Capture and annotate</summary>
+    </key>
+    <key name="capture-copy" type="as">
+      <default><![CDATA[['<Control>F1']]]></default>
+      <summary>Capture a region straight to the clipboard</summary>
+    </key>
+    <key name="pin" type="as">
+      <default><![CDATA[['F3']]]></default>
+      <summary>Pin the clipboard to the screen</summary>
+    </key>
+    <key name="toggle-pins" type="as">
+      <default><![CDATA[['<Shift>F3']]]></default>
+      <summary>Hide or show all pins</summary>
+    </key>
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Show the top bar indicator</summary>
+    </key>
+    <key name="debug-mode" type="b">
+      <default>false</default>
+      <summary>Expose test-only D-Bus methods (screenshot and input injection)</summary>
+      <description>Only for automated testing in a nested or headless shell. Never enable in a normal session.</description>
+    </key>
+  </schema>
+</schemalist>

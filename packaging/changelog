@@ -1,0 +1,58 @@
+glint (1.2.1) unstable; urgency=medium
+
+  * Replace the multi-colour glass icon with an orange crop-frame G, with
+    matching small-size and symbolic variants.
+  * Use warm orange for selection outlines, guides, handles, confirmation
+    buttons, text editing bounds and focused pin borders.
+  * Add the author's email to preferences, with mail and copy actions, and
+    update the package maintainer and AppStream contact information.
+
+ -- chenwu <geekchenwu@gmail.com>  Mon, 26 Oct 2026 19:20:00 +0800
+
+glint (1.2.0) unstable; urgency=medium
+
+  * Build a single-file installer that uses APT to install the bundled Debian
+    package and its dependencies, including python3-gi-cairo.
+  * Allow capture, annotation, copy and basic pinning immediately after a
+    first install through the system screenshot portal.
+  * Provide temporary, conflict-aware shortcuts until GNOME loads the native
+    extension at the next normal login, then remove the temporary shortcuts.
+  * Keep existing shortcuts and user-disabled extensions intact; test initial
+    setup in a separate desktop where the native extension is not registered.
+  * Copy clipboard image bytes before the Shell callback releases them, and
+    raise capture windows only after their first frame is available.
+
+ -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 18:15:00 +0800
+
+glint (1.1.1) unstable; urgency=medium
+
+  * Export clipboard textures as GdkTexture so other applications receive
+    image/png, and claim the clipboard before closing the capture overlay.
+  * Encode lossless screenshot tiles in parallel to avoid blocking the
+    selection overlay on full-desktop PNG compression.
+  * Center the top bar menu on the Glint indicator.
+  * Add image transport and cross-application paste regression checks.
+
+ -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 17:25:00 +0800
+
+glint (1.1.0) unstable; urgency=medium
+
+  * Snipaste-style selection frame: the whole area outside the selection
+    resizes the nearest edge(s), and the frame stays adjustable after
+    choosing a tool or drawing.
+  * Arrow keys move the selection by one pixel; Ctrl+arrow pushes that edge
+    out, Shift+arrow pulls it in. W A S D step the pointer one pixel.
+  * R restores the last region, Space hides the toolbar, [ and ] change the
+    pen size.
+  * A press made before the editor is up no longer reaches the window under
+    the frozen frame.
+
+ -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 14:40:00 +0800
+
+glint (1.0.0) unstable; urgency=medium
+
+  * First release: in-shell capture (F1 / Ctrl+F1) that keeps menus and
+    popups in the shot, annotation editor, pins (F3 / Shift+F3),
+    preferences, and first-run shortcut hand-over from Snipaste.
+
+ -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 14:00:00 +0800

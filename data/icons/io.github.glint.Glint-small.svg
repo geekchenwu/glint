@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Pixel-hinted crop-frame G for 16-32 px launchers. -->
+  <rect x="1" y="2" width="30" height="29" rx="7" fill="#C65316"/>
+  <rect x="1" y="1" width="30" height="29" rx="7" fill="#F37021"/>
+  <g fill="none" stroke="#FFF7ED" stroke-width="3" stroke-linecap="square" stroke-linejoin="round">
+    <path d="M18 8.5h-6c-2 0-3.5 1.5-3.5 3.5v7c0 2 1.5 3.5 3.5 3.5h7c2 0 3.5-1.5 3.5-3.5v-3H17"/>
+    <path d="M22.5 8.5h2v2"/>
+  </g>
+</svg>

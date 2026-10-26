@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Glint daemon
+Comment=Keeps the Glint editor resident so captures open instantly
+Exec=@GLINT@ --daemon
+Icon=io.github.glint.Glint
+NoDisplay=true
+Terminal=false
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3

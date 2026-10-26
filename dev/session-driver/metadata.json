@@ -1,0 +1,6 @@
+{
+  "uuid": "glint-test@local",
+  "name": "Glint isolated session driver",
+  "description": "Input and observations for installation tests only",
+  "shell-version": ["50"]
+}

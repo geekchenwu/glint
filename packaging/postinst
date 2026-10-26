@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+# Schemas, icon cache and desktop database are refreshed by dpkg triggers.
+if [ "$1" = "configure" ] && command -v python3 >/dev/null 2>&1; then
+    python3 -m compileall -q -f /usr/share/glint/glint_app >/dev/null 2>&1 || true
+fi
+exit 0

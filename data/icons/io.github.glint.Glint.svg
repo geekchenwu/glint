@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- A crop-frame G with a detached upper-right capture corner. -->
+  <rect x="8" y="12" width="112" height="108" rx="27" fill="#C65316"/>
+  <rect x="8" y="8" width="112" height="108" rx="27" fill="#F37021"/>
+  <g fill="none" stroke="#FFF7ED" stroke-width="11" stroke-linecap="square" stroke-linejoin="round">
+    <path d="M74 37H49c-8 0-13 5-13 13v26c0 8 5 13 13 13h28c8 0 13-5 13-13V65H68"/>
+    <path d="M91 37h7v7"/>
+  </g>
+</svg>
