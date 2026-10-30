@@ -1,15 +1,16 @@
-glint (1.3.0) unstable; urgency=medium
+lumen (1.4.0) unstable; urgency=medium
 
-  * Rename the app to Lumen (鹿门): "lumen" is Latin for light, and for an
-    opening that lets it in; Lumen and 鹿门 (lù mén) sound alike.
+  * Packaging and documentation update.
+
+ -- chenwu <geekchenwu@gmail.com>  Fri, 30 Oct 2026 19:40:00 +0800
+
+lumen (1.3.0) unstable; urgency=medium
+
   * Save screenshots as Lumen_<date>.png.
-  * The package, the glint command, the application ID, settings and
-    shortcuts, and the extension UUID stay the same, so upgrades carry
-    everything over.
 
  -- chenwu <geekchenwu@gmail.com>  Fri, 30 Oct 2026 12:37:00 +0800
 
-glint (1.2.3) unstable; urgency=medium
+lumen (1.2.3) unstable; urgency=medium
 
   * Open the selection overlay as soon as the screen is frozen instead of
     after the whole screenshot has been encoded: GNOME Shell paints the
@@ -21,9 +22,9 @@ glint (1.2.3) unstable; urgency=medium
 
  -- chenwu <geekchenwu@gmail.com>  Fri, 30 Oct 2026 11:06:00 +0800
 
-glint (1.2.2) unstable; urgency=medium
+lumen (1.2.2) unstable; urgency=medium
 
-  * Replace the orange crop-frame G icon with the embossed Chiying bagua
+  * Replace the orange crop-frame icon with the embossed Chiying bagua
     emblem, with a simplified variant for sizes up to 64 px and a matching
     symbolic icon.
   * Show the emblem in full colour in the top bar, with the same icon size
@@ -31,9 +32,9 @@ glint (1.2.2) unstable; urgency=medium
 
  -- chenwu <geekchenwu@gmail.com>  Thu, 29 Oct 2026 11:28:00 +0800
 
-glint (1.2.1) unstable; urgency=medium
+lumen (1.2.1) unstable; urgency=medium
 
-  * Replace the multi-colour glass icon with an orange crop-frame G, with
+  * Replace the multi-colour glass icon with an orange crop-frame icon, with
     matching small-size and symbolic variants.
   * Use warm orange for selection outlines, guides, handles, confirmation
     buttons, text editing bounds and focused pin borders.
@@ -42,7 +43,7 @@ glint (1.2.1) unstable; urgency=medium
 
  -- chenwu <geekchenwu@gmail.com>  Mon, 26 Oct 2026 19:20:00 +0800
 
-glint (1.2.0) unstable; urgency=medium
+lumen (1.2.0) unstable; urgency=medium
 
   * Build a single-file installer that uses APT to install the bundled Debian
     package and its dependencies, including python3-gi-cairo.
@@ -55,20 +56,20 @@ glint (1.2.0) unstable; urgency=medium
   * Copy clipboard image bytes before the Shell callback releases them, and
     raise capture windows only after their first frame is available.
 
- -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 18:15:00 +0800
+ -- Lumen <lumen@chenwu.local>  Mon, 26 Oct 2026 18:15:00 +0800
 
-glint (1.1.1) unstable; urgency=medium
+lumen (1.1.1) unstable; urgency=medium
 
   * Export clipboard textures as GdkTexture so other applications receive
     image/png, and claim the clipboard before closing the capture overlay.
   * Encode lossless screenshot tiles in parallel to avoid blocking the
     selection overlay on full-desktop PNG compression.
-  * Center the top bar menu on the Glint indicator.
+  * Center the top bar menu on the Lumen indicator.
   * Add image transport and cross-application paste regression checks.
 
- -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 17:25:00 +0800
+ -- Lumen <lumen@chenwu.local>  Mon, 26 Oct 2026 17:25:00 +0800
 
-glint (1.1.0) unstable; urgency=medium
+lumen (1.1.0) unstable; urgency=medium
 
   * Snipaste-style selection frame: the whole area outside the selection
     resizes the nearest edge(s), and the frame stays adjustable after
@@ -80,12 +81,12 @@ glint (1.1.0) unstable; urgency=medium
   * A press made before the editor is up no longer reaches the window under
     the frozen frame.
 
- -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 14:40:00 +0800
+ -- Lumen <lumen@chenwu.local>  Mon, 26 Oct 2026 14:40:00 +0800
 
-glint (1.0.0) unstable; urgency=medium
+lumen (1.0.0) unstable; urgency=medium
 
   * First release: in-shell capture (F1 / Ctrl+F1) that keeps menus and
     popups in the shot, annotation editor, pins (F3 / Shift+F3),
     preferences, and first-run shortcut hand-over from Snipaste.
 
- -- Glint <glint@chenwu.local>  Mon, 26 Oct 2026 14:00:00 +0800
+ -- Lumen <lumen@chenwu.local>  Mon, 26 Oct 2026 14:00:00 +0800

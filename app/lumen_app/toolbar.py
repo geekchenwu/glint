@@ -33,7 +33,7 @@ def _sep():
 
 class Toolbar(Gtk.Box):
     def __init__(self, session):
-        super().__init__(orientation=Gtk.Orientation.HORIZONTAL, css_classes=['glint-bar'],
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL, css_classes=['lumen-bar'],
                          halign=Gtk.Align.START, valign=Gtk.Align.START, visible=False)
         self.session = session
         self._syncing = False
@@ -113,7 +113,7 @@ class _SizeDot(Gtk.DrawingArea):
 class PropsBar(Gtk.Box):
     def __init__(self, session):
         super().__init__(orientation=Gtk.Orientation.HORIZONTAL,
-                         css_classes=['glint-bar', 'glint-props'],
+                         css_classes=['lumen-bar', 'lumen-props'],
                          halign=Gtk.Align.START, valign=Gtk.Align.START, visible=False)
         self.session = session
         self._syncing = False

@@ -1,6 +1,0 @@
-VERSION = '1.3.0'
-APP_ID = 'io.github.glint.Glint'
-DAEMON_PATH = '/io/github/glint/Glint/Daemon'
-DAEMON_IFACE = 'io.github.glint.Daemon'
-SHELL_PATH = '/io/github/glint/Shell'
-SHELL_IFACE = 'io.github.glint.Shell'

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Drive the headless test shell through Glint's debug D-Bus methods.
+"""Drive the headless test shell through Lumen's debug D-Bus methods.
 
   ctl.py shot PATH            stage screenshot
   ctl.py capture [edit|copy]  same as pressing F1 / Ctrl+F1
@@ -10,7 +10,7 @@
   ctl.py key NAME [ctrl] [shift]   (GDK key names, e.g. Escape, Return, r, z)
   ctl.py type TEXT
   ctl.py scroll DY
-Run after `source /tmp/glint-hl/env`.
+Run after `source /tmp/lumen-hl/env`.
 """
 import os
 import sys
@@ -24,9 +24,9 @@ from gi.repository import Gdk, Gio, GLib  # noqa: E402
 # Clutter virtual devices take Clutter button numbers, not evdev codes.
 BTN_LEFT, BTN_RIGHT = 1, 3
 bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
-TEST_SESSION = os.environ.get('GLINT_TEST_SESSION') == '1'
-OBJECT = '/io/github/glint/TestSession' if TEST_SESSION else '/io/github/glint/Shell'
-INTERFACE = 'io.github.glint.TestSession' if TEST_SESSION else 'io.github.glint.Shell'
+TEST_SESSION = os.environ.get('LUMEN_TEST_SESSION') == '1'
+OBJECT = '/io/github/lumen/TestSession' if TEST_SESSION else '/io/github/lumen/Shell'
+INTERFACE = 'io.github.lumen.TestSession' if TEST_SESSION else 'io.github.lumen.Shell'
 
 
 def call(method, sig=None, *args):

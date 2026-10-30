@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Move F1/F3 family shortcuts from Snipaste's gsd custom keybindings to Glint.
+# Move F1/F3 family shortcuts from Snipaste's gsd custom keybindings to Lumen.
 #   hotkeys.sh take-over   back up and disable the Snipaste custom shortcuts
 #   hotkeys.sh restore     put the backed-up custom shortcuts back
 set -euo pipefail
 
 BASE=org.gnome.settings-daemon.plugins.media-keys
-BACKUP="${XDG_CONFIG_HOME:-$HOME/.config}/glint/snipaste-keybindings.backup"
+BACKUP="${XDG_CONFIG_HOME:-$HOME/.config}/lumen/snipaste-keybindings.backup"
 
 case "${1:-}" in
   take-over)

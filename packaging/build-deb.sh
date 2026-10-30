@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Build dist/glint_<version>_all.deb from the source tree.
+# Build dist/lumen_<version>_all.deb from the source tree.
 #   packaging/build-deb.sh            build
 #   packaging/build-deb.sh --stage    also keep the staged tree in dist/stage
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="$(sed -n "s/^VERSION = '\(.*\)'/\1/p" "$SRC/app/glint_app/__init__.py")"
-UUID="glint@chenwu.local"
-APP_ID="io.github.glint.Glint"
-PKG="glint_${VERSION}_all"
+VERSION="$(sed -n "s/^VERSION = '\(.*\)'/\1/p" "$SRC/app/lumen_app/__init__.py")"
+UUID="lumen@chenwu.local"
+APP_ID="io.github.lumen.Lumen"
+PKG="lumen_${VERSION}_all"
 DIST="$SRC/dist"
 # Timestamp of the newest changelog entry, so rebuilds are reproducible.
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(date -d "$(sed -n 's/^ -- .*>  //p' \
@@ -20,22 +20,22 @@ root="$work/$PKG"
 share="$root/usr/share"
 
 # Editor.
-install -d "$share/glint/glint_app" "$share/glint/fonts" "$root/usr/bin"
-install -m 755 "$SRC/app/glint" "$share/glint/glint"
-install -m 644 "$SRC"/app/glint_app/*.py "$share/glint/glint_app/"
-install -m 644 "$SRC"/fonts/*.ttf "$SRC/fonts/OFL.txt" "$share/glint/fonts/"
+install -d "$share/lumen/lumen_app" "$share/lumen/fonts" "$root/usr/bin"
+install -m 755 "$SRC/app/lumen" "$share/lumen/lumen"
+install -m 644 "$SRC"/app/lumen_app/*.py "$share/lumen/lumen_app/"
+install -m 644 "$SRC"/fonts/*.ttf "$SRC/fonts/OFL.txt" "$share/lumen/fonts/"
 # A wrapper rather than a symlink: the extension checks the daemon's argv
-# for the trusted /usr/share/glint path.
-printf '#!/bin/sh\nexec /usr/share/glint/glint "$@"\n' > "$root/usr/bin/glint"
-chmod 755 "$root/usr/bin/glint"
+# for the trusted /usr/share/lumen path.
+printf '#!/bin/sh\nexec /usr/share/lumen/lumen "$@"\n' > "$root/usr/bin/lumen"
+chmod 755 "$root/usr/bin/lumen"
 
 # Shell extension; its schema goes to the system schema dir, compiled by
 # the libglib2.0 dpkg trigger.
 ext="$share/gnome-shell/extensions/$UUID"
 install -d "$ext/icons" "$share/glib-2.0/schemas"
 install -m 644 "$SRC/extension/$UUID"/{metadata.json,extension.js,prefs.js} "$ext/"
-install -m 644 "$SRC/extension/$UUID/icons/glint.svg" "$ext/icons/"
-install -m 644 "$SRC/extension/$UUID/schemas/org.gnome.shell.extensions.glint.gschema.xml" \
+install -m 644 "$SRC/extension/$UUID/icons/lumen.svg" "$ext/icons/"
+install -m 644 "$SRC/extension/$UUID/schemas/org.gnome.shell.extensions.lumen.gschema.xml" \
   "$share/glib-2.0/schemas/"
 
 # Icons.
@@ -46,16 +46,16 @@ python3 "$SRC/tools/render-icons.py" "$share/icons/hicolor"
 
 # Desktop integration.
 install -d "$share/applications" "$root/etc/xdg/autostart" "$share/metainfo"
-sed "s|@GLINT@|/usr/bin/glint|g" "$SRC/data/$APP_ID.desktop" > "$share/applications/$APP_ID.desktop"
-sed "s|@GLINT@|/usr/share/glint/glint|g" "$SRC/data/glint-daemon.desktop" \
+sed "s|@LUMEN@|/usr/bin/lumen|g" "$SRC/data/$APP_ID.desktop" > "$share/applications/$APP_ID.desktop"
+sed "s|@LUMEN@|/usr/share/lumen/lumen|g" "$SRC/data/lumen-daemon.desktop" \
   > "$root/etc/xdg/autostart/$APP_ID.Daemon.desktop"
 install -m 644 "$SRC/data/$APP_ID.metainfo.xml" "$share/metainfo/"
 
 # Docs.
-install -d "$share/doc/glint"
-install -m 644 "$SRC/packaging/copyright" "$share/doc/glint/copyright"
-install -m 644 "$SRC/packaging/INSTALL.md" "$share/doc/glint/INSTALL.md"
-gzip -9n -c "$SRC/packaging/changelog" > "$share/doc/glint/changelog.gz"
+install -d "$share/doc/lumen"
+install -m 644 "$SRC/packaging/copyright" "$share/doc/lumen/copyright"
+install -m 644 "$SRC/packaging/INSTALL.md" "$share/doc/lumen/INSTALL.md"
+gzip -9n -c "$SRC/packaging/changelog" > "$share/doc/lumen/changelog.gz"
 
 # Control files.
 install -d "$root/DEBIAN"
@@ -63,7 +63,7 @@ install -m 755 "$SRC/packaging/postinst" "$SRC/packaging/prerm" "$root/DEBIAN/"
 echo "/etc/xdg/autostart/$APP_ID.Daemon.desktop" > "$root/DEBIAN/conffiles"
 size="$(du -sk --exclude=DEBIAN "$root" | cut -f1)"
 cat > "$root/DEBIAN/control" <<EOF
-Package: glint
+Package: lumen
 Version: $VERSION
 Architecture: all
 Maintainer: chenwu <geekchenwu@gmail.com>

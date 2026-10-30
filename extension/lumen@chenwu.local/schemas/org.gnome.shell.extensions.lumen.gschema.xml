@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="org.gnome.shell.extensions.glint" path="/org/gnome/shell/extensions/glint/">
+  <schema id="org.gnome.shell.extensions.lumen" path="/org/gnome/shell/extensions/lumen/">
     <key name="capture" type="as">
       <default><![CDATA[['F1']]]></default>
       <summary>Capture and annotate</summary>

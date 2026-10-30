@@ -12,7 +12,7 @@ from gi.repository import Gdk, GLib, Gtk
 
 class Receiver(Gtk.Application):
     def __init__(self, result_path):
-        super().__init__(application_id='io.github.glint.ClipboardReceiver')
+        super().__init__(application_id='io.github.lumen.ClipboardReceiver')
         self.result_path = result_path
 
     def do_activate(self):

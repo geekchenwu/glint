@@ -15,18 +15,18 @@ import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
-EXT_UUID = 'glint@chenwu.local'
-EXT_SCHEMA = 'org.gnome.shell.extensions.glint'
+EXT_UUID = 'lumen@chenwu.local'
+EXT_SCHEMA = 'org.gnome.shell.extensions.lumen'
 SHORTCUT_KEYS = ('capture', 'capture-copy', 'pin', 'toggle-pins')
 DEFAULT_SHORTCUTS = ('F1', '<Control>F1', 'F3', '<Shift>F3')
 MEDIA_KEYS = 'org.gnome.settings-daemon.plugins.media-keys'
 CUSTOM_KEY = MEDIA_KEYS + '.custom-keybinding'
-FALLBACK_PREFIX = '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/glint-'
+FALLBACK_PREFIX = '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/lumen-'
 FALLBACK_COMMANDS = dict(zip(SHORTCUT_KEYS, ('capture', 'copy', 'pin', 'toggle-pins')))
 
 
 def config_dir():
-    path = os.path.join(GLib.get_user_config_dir(), 'glint')
+    path = os.path.join(GLib.get_user_config_dir(), 'lumen')
     os.makedirs(path, exist_ok=True)
     return path
 
@@ -111,7 +111,7 @@ def prepare_session():
 
 # ---- shortcuts -------------------------------------------------------------
 
-def glint_shortcuts():
+def lumen_shortcuts():
     settings = _extension_settings()
     if settings:
         return {accel for key in SHORTCUT_KEYS for accel in settings.get_strv(key) if accel}
@@ -141,7 +141,7 @@ def _fallback_path(key):
 
 
 def _launcher():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'glint'))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lumen'))
 
 
 def _owned_fallback(path):
@@ -153,9 +153,9 @@ def _owned_fallback(path):
         command = shlex.split(entry.get_string('command'))
     except ValueError:
         return False
-    launchers = {_launcher(), '/usr/share/glint/glint',
-                 os.path.join(GLib.get_user_data_dir(), 'glint', 'glint')}
-    return (entry.get_string('name') == 'Glint (session fallback)' and
+    launchers = {_launcher(), '/usr/share/lumen/lumen',
+                 os.path.join(GLib.get_user_data_dir(), 'lumen', 'lumen')}
+    return (entry.get_string('name') == 'Lumen (session fallback)' and
             len(command) == 2 and command[0] in launchers and
             command[1] == FALLBACK_COMMANDS[key])
 
@@ -185,7 +185,7 @@ def install_fallback_shortcuts():
                 entry.set_string('binding', '')
                 paths.remove(path)
             continue
-        entry.set_string('name', 'Glint (session fallback)')
+        entry.set_string('name', 'Lumen (session fallback)')
         entry.set_string('command', f'{shlex.quote(_launcher())} {FALLBACK_COMMANDS[key]}')
         entry.set_string('binding', binding)
         occupied.add(_normalize(binding))
@@ -208,8 +208,8 @@ def remove_fallback_shortcuts():
 
 
 def conflicts():
-    """Custom shortcuts that use one of Glint's keys."""
-    ours = {_normalize(a) for a in glint_shortcuts()} - {None}
+    """Custom shortcuts that use one of Lumen's keys."""
+    ours = {_normalize(a) for a in lumen_shortcuts()} - {None}
     found = []
     for path in _custom_paths():
         if _owned_fallback(path):

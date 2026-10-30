@@ -5,18 +5,18 @@ import time
 
 from . import APP_ID, DAEMON_IFACE, DAEMON_PATH, SHELL_IFACE, SHELL_PATH, VERSION
 
-USAGE = '''glint - 鹿门 Lumen：截图 / 标注 / 贴图
+USAGE = '''lumen - 鹿门 Lumen：截图 / 标注 / 贴图
 
 用法:
-  glint              启动常驻编辑器（通常由登录自启或扩展拉起）
-  glint capture      截图并标注（等同 F1）
-  glint copy         截图后直接复制（等同 Ctrl+F1）
-  glint pin          贴图（等同 F3）
-  glint toggle-pins  隐藏 / 显示全部贴图（等同 Shift+F3）
-  glint activate     安装后立即启用，无需立即注销桌面
-  glint setup        启用 GNOME 扩展，并把冲突的快捷键交给鹿门（会备份）
-  glint hotkeys restore   恢复被鹿门接管前的快捷键
-  glint --version
+  lumen              启动常驻编辑器（通常由登录自启或扩展拉起）
+  lumen capture      截图并标注（等同 F1）
+  lumen copy         截图后直接复制（等同 Ctrl+F1）
+  lumen pin          贴图（等同 F3）
+  lumen toggle-pins  隐藏 / 显示全部贴图（等同 Shift+F3）
+  lumen activate     安装后立即启用，无需立即注销桌面
+  lumen setup        启用 GNOME 扩展，并把冲突的快捷键交给鹿门（会备份）
+  lumen hotkeys restore   恢复被鹿门接管前的快捷键
+  lumen --version
 '''
 COMMANDS = {
     'capture': ('Capture', 'edit'),
@@ -53,8 +53,8 @@ def _ensure_daemon():
             Gio.DBusCallFlags.NONE, 1000, None).unpack()[0]
 
     if not running():
-        launcher = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'glint'))
-        runtime = os.path.join(GLib.get_user_runtime_dir(), 'glint')
+        launcher = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lumen'))
+        runtime = os.path.join(GLib.get_user_runtime_dir(), 'lumen')
         os.makedirs(runtime, mode=0o700, exist_ok=True)
         log_fd = os.open(os.path.join(runtime, 'daemon.log'),
                          os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
@@ -138,7 +138,7 @@ def main(argv):
         print(USAGE)
         return 0
     if args and args[0] in ('-v', '--version'):
-        print(f'glint {VERSION}')
+        print(f'lumen {VERSION}')
         return 0
     if args and args[0] == 'activate':
         from . import firstrun
@@ -146,7 +146,7 @@ def main(argv):
             status = firstrun.prepare_session()
             _ensure_daemon()
         except Exception as error:
-            print(f'glint: {error}', file=sys.stderr)
+            print(f'lumen: {error}', file=sys.stderr)
             return 1
         print('鹿门已就绪，可从应用菜单打开并截图。' if status == 'enabled' else
               '鹿门已就绪，可从应用菜单打开并截图。首次请允许系统截图请求，'
@@ -164,7 +164,7 @@ def main(argv):
         try:
             _capture_or_fallback(method, arg)
         except Exception as e:  # noqa: BLE001
-            print(f'glint: {e}', file=sys.stderr)
+            print(f'lumen: {e}', file=sys.stderr)
             return 1
         return 0
     import gi

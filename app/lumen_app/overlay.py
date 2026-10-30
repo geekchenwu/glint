@@ -642,17 +642,17 @@ class Session:
 class TextEditor:
     """A live TextView placed so its first glyph lands on the click point."""
 
-    PAD_X, PAD_Y = 5, 3  # border + CSS padding of .glint-text-editor
+    PAD_X, PAD_Y = 5, 3  # border + CSS padding of .lumen-text-editor
 
     def __init__(self, session, window, p):
         self.session = session
         self.window = window
         self.p = p
-        self.box = Gtk.Box(css_classes=['glint-text-editor'],
+        self.box = Gtk.Box(css_classes=['lumen-text-editor'],
                            halign=Gtk.Align.START, valign=Gtk.Align.START)
         self.view = Gtk.TextView(wrap_mode=Gtk.WrapMode.NONE, accepts_tab=False,
                                  top_margin=0, bottom_margin=0, left_margin=0, right_margin=0)
-        self.view.set_name('glint-text')
+        self.view.set_name('lumen-text')
         self.view.set_size_request(24, -1)
         self.box.append(self.view)
         self.provider = Gtk.CssProvider()
@@ -670,7 +670,7 @@ class TextEditor:
         self.size_ip = self.session.size_ip()
         px = self.size_ip / self.session.f
         self.provider.load_from_string(
-            f'#glint-text {{ color: {self.color}; font-family: {theme.TEXT_FAMILY};'
+            f'#lumen-text {{ color: {self.color}; font-family: {theme.TEXT_FAMILY};'
             f' font-weight: 600; font-size: {px:.2f}px; }}')
 
     def text(self):
@@ -999,8 +999,8 @@ class Canvas(Gtk.Widget):
 
 class OverlayWindow(Gtk.Window):
     def __init__(self, session, mon, gdk_monitor):
-        super().__init__(application=session.app, title='glint-overlay', decorated=False)
-        self.add_css_class('glint-overlay')
+        super().__init__(application=session.app, title='lumen-overlay', decorated=False)
+        self.add_css_class('lumen-overlay')
         if session.backdrop:
             self.add_css_class('shell-backdrop')
         self.session = session

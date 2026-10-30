@@ -5,7 +5,7 @@ import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const IFACE = `<node><interface name="io.github.glint.TestSession">
+const IFACE = `<node><interface name="io.github.lumen.TestSession">
   <method name="DebugState"><arg type="s" direction="out"/></method>
   <method name="DebugPointer">
     <arg type="d" direction="in"/><arg type="d" direction="in"/>
@@ -29,7 +29,7 @@ export default class SessionDriver extends Extension {
             });
         });
         this._bus = Gio.DBusExportedObject.wrapJSObject(IFACE, this);
-        this._bus.export(Gio.DBus.session, '/io/github/glint/TestSession');
+        this._bus.export(Gio.DBus.session, '/io/github/lumen/TestSession');
     }
 
     disable() {
@@ -56,9 +56,9 @@ export default class SessionDriver extends Extension {
         return JSON.stringify({
             focus: global.display.focus_window?.get_title() ?? null,
             windows: windows.map(window => window.get_title()),
-            overlays: windows.filter(window => window.get_title() === 'glint-overlay').length,
+            overlays: windows.filter(window => window.get_title() === 'lumen-overlay').length,
             paintedOverlays: windows.filter(window =>
-                window.get_title() === 'glint-overlay' && this._painted.has(window)).length,
+                window.get_title() === 'lumen-overlay' && this._painted.has(window)).length,
             stage: {width: global.stage.width, height: global.stage.height},
             startingUp: Main.layoutManager._startingUp,
             overview: Main.overview.visible,

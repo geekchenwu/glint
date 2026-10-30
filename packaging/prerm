@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-rm -rf /usr/share/glint/glint_app/__pycache__
+rm -rf /usr/share/lumen/lumen_app/__pycache__
 exit 0

@@ -7,7 +7,7 @@ from gi.repository import Gio, Gtk
 
 class App(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id='io.github.glint.TestSubject')
+        super().__init__(application_id='io.github.lumen.TestSubject')
 
     def do_activate(self):
         win = Gtk.ApplicationWindow(application=self, title='Release notes', default_width=760,

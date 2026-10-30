@@ -10,22 +10,22 @@ ZOOM_STEPS = (0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0, 
 
 class PinWindow(Gtk.Window):
     def __init__(self, app, texture, device_scale, position=None):
-        title = 'glint-pin' if position is None else \
-            f'glint-pin@{int(round(position[0]))},{int(round(position[1]))}'
+        title = 'lumen-pin' if position is None else \
+            f'lumen-pin@{int(round(position[0]))},{int(round(position[1]))}'
         super().__init__(application=app, title=title, resizable=False)
         self.app = app
         self.texture = texture
         self.base_w = texture.get_width() / device_scale
         self.base_h = texture.get_height() / device_scale
         self.zoom = 1.0
-        self.add_css_class('glint-pin')
+        self.add_css_class('lumen-pin')
         # An empty custom titlebar keeps client-side decorations (rounded
         # corners, theme shadow, resize-free frame) without any visible chrome.
         self.set_titlebar(Gtk.Box())
 
         self.picture = Gtk.Picture(paintable=texture, can_shrink=True,
                                    content_fit=Gtk.ContentFit.FILL)
-        self.osd = Gtk.Label(css_classes=['glint-osd'], halign=Gtk.Align.END,
+        self.osd = Gtk.Label(css_classes=['lumen-osd'], halign=Gtk.Align.END,
                              valign=Gtk.Align.END, visible=False, can_target=False)
         overlay = Gtk.Overlay(child=self.picture)
         overlay.add_overlay(self.osd)
@@ -60,7 +60,7 @@ class PinWindow(Gtk.Window):
             item.set_attribute_value('accel', GLib.Variant('s', accel))
             menu.append_item(item)
         self.menu = Gtk.PopoverMenu(menu_model=menu, has_arrow=False, halign=Gtk.Align.START)
-        self.menu.add_css_class('glint-menu')
+        self.menu.add_css_class('lumen-menu')
         self.menu.set_parent(overlay)
         self.connect('destroy', lambda *_: self.menu.unparent())
 

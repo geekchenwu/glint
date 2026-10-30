@@ -5,9 +5,9 @@
 #   dev/headless.sh start && dev/frame.sh
 set -euo pipefail
 DEV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source /tmp/glint-hl/env
+source /tmp/lumen-hl/env
 RUN="${1:-frame}"
-OUT=/tmp/glint-shots
+OUT=/tmp/lumen-shots
 mkdir -p "$OUT"
 ctl() { python3 "$DEV/ctl.py" "$@"; }
 shot() { sleep 0.3; ctl shot "$OUT/$RUN-$1.png"; echo "$OUT/$RUN-$1.png"; }
@@ -61,5 +61,5 @@ shot 07-wasd                            # loupe reads 405 , 402
 ctl key r                               # last region
 shot 08-last-region
 ctl key Escape
-echo "--- tracebacks: $(grep -c Traceback /tmp/glint-hl/app.log || true)"
-grep -E "JS ERROR|MovePointer|ACCESS" /tmp/glint-hl/shell.log | tail -5 || true
+echo "--- tracebacks: $(grep -c Traceback /tmp/lumen-hl/app.log || true)"
+grep -E "JS ERROR|MovePointer|ACCESS" /tmp/lumen-hl/shell.log | tail -5 || true

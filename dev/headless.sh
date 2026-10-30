@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start an isolated headless GNOME Shell with Glint installed, for automated
+# Start an isolated headless GNOME Shell with Lumen installed, for automated
 # testing. Nothing here touches the real session: HOME, dconf, runtime dir
 # and the session bus are all private.
 #
@@ -7,17 +7,17 @@
 # private bus activates (dconf-service!) inherit the bus daemon's environment,
 # not the caller's. GSettings additionally uses the keyfile backend so no
 # dconf-service is involved at all.
-#   dev/headless.sh start [WxH] [scale]   then:  source /tmp/glint-hl/env
+#   dev/headless.sh start [WxH] [scale]   then:  source /tmp/lumen-hl/env
 #   dev/headless.sh system [WxH]          test the installed .deb in /usr/share
 #   dev/headless.sh firstrun [WxH]        like system, but as a fresh login after
 #                                         install: extension off, F1 held by a
 #                                         Snipaste-style custom shortcut
-#   dev/headless.sh fresh-install        start without any Glint installation
+#   dev/headless.sh fresh-install        start without any Lumen installation
 #   dev/headless.sh next-login           keep the first-install test's user data
 #   dev/headless.sh stop
 set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ROOT=/tmp/glint-hl
+ROOT=/tmp/lumen-hl
 
 # Every process of the sandbox session carries its private runtime dir, so
 # match on that rather than on command lines; the real session is never hit.
@@ -59,15 +59,15 @@ case "${1:-start}" in
   fresh-install) FRESH=1 ;;
   next-login) FRESH=1; RESUME=1 ;;
 esac
-SCHEMADIR="--schemadir $ROOT/data/gnome-shell/extensions/glint@chenwu.local/schemas"
+SCHEMADIR="--schemadir $ROOT/data/gnome-shell/extensions/lumen@chenwu.local/schemas"
 INSTALL="bash \"$SRC/install.sh\" --no-activate >/dev/null"
-ENABLED="['glint@chenwu.local']"
+ENABLED="['lumen@chenwu.local']"
 MK=org.gnome.settings-daemon.plugins.media-keys
 CUSTOM=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/snipaste-f1/
 CLASH="true"
 if [ "$SYSTEM" = 1 ]; then
   SCHEMADIR=""
-  INSTALL="test -f /usr/share/gnome-shell/extensions/glint@chenwu.local/extension.js"
+  INSTALL="test -f /usr/share/gnome-shell/extensions/lumen@chenwu.local/extension.js"
 fi
 if [ "$FIRSTRUN" = 1 ]; then
   ENABLED="[]"
@@ -78,11 +78,11 @@ gsettings set $MK.custom-keybinding:$CUSTOM binding 'F1'"
 fi
 if [ "$FRESH" = 1 ]; then
   INSTALL="mkdir -p \"$ROOT/data/gnome-shell/extensions\"
-cp -r \"$SRC/dev/session-driver\" \"$ROOT/data/gnome-shell/extensions/glint-test@local\""
-  ENABLED="['glint-test@local']"
+cp -r \"$SRC/dev/session-driver\" \"$ROOT/data/gnome-shell/extensions/lumen-test@local\""
+  ENABLED="['lumen-test@local']"
 fi
 if [ "$RESUME" = 1 ]; then
-  test -f "$ROOT/data/glint/glint"
+  test -f "$ROOT/data/lumen/lumen"
   INSTALL="true"
 fi
 "$0" stop
@@ -98,13 +98,13 @@ cat > "$ROOT/inner.sh" <<EOF
 set -e
 $INSTALL
 if [ "$FRESH" = 0 ]; then
-  gsettings $SCHEMADIR set org.gnome.shell.extensions.glint debug-mode true
+  gsettings $SCHEMADIR set org.gnome.shell.extensions.lumen debug-mode true
 fi
 if [ "$RESUME" = 0 ]; then
   gsettings set org.gnome.shell enabled-extensions "$ENABLED"
 fi
 # Refuse to continue unless the write landed in the sandbox.
-grep -q glint "$ROOT/config/glib-2.0/settings/keyfile" || { echo "settings escaped sandbox" >&2; exit 1; }
+grep -q lumen "$ROOT/config/glib-2.0/settings/keyfile" || { echo "settings escaped sandbox" >&2; exit 1; }
 $CLASH
 gsettings set org.gnome.shell welcome-dialog-last-shown-version '999'
 gsettings set org.gnome.desktop.interface enable-animations false
@@ -112,17 +112,17 @@ gsettings set org.gnome.desktop.interface enable-hot-corners false
 {
   echo "export HOME=$ROOT/home XDG_RUNTIME_DIR=$ROOT/run XDG_CONFIG_HOME=$ROOT/config"
   echo "export XDG_DATA_HOME=$ROOT/data XDG_CACHE_HOME=$ROOT/cache GSETTINGS_BACKEND=keyfile"
-  echo "export DBUS_SESSION_BUS_ADDRESS='\$DBUS_SESSION_BUS_ADDRESS' WAYLAND_DISPLAY=glint-hl"
+  echo "export DBUS_SESSION_BUS_ADDRESS='\$DBUS_SESSION_BUS_ADDRESS' WAYLAND_DISPLAY=lumen-hl"
   echo "unset DISPLAY"
 } > $ROOT/env
 if [ "$FRESH" = 1 ]; then
   (
-    until [ -S "$ROOT/run/glint-hl" ]; do sleep 0.1; done
-    export WAYLAND_DISPLAY=glint-hl
+    until [ -S "$ROOT/run/lumen-hl" ]; do sleep 0.1; done
+    export WAYLAND_DISPLAY=lumen-hl
     exec /usr/libexec/gsd-media-keys
   ) > "$ROOT/media-keys.log" 2>&1 &
 fi
-exec gnome-shell --headless --no-x11 --virtual-monitor $SIZE --wayland-display glint-hl
+exec gnome-shell --headless --no-x11 --virtual-monitor $SIZE --wayland-display lumen-hl
 EOF
 
 runner=(dbus-run-session -- bash "$ROOT/inner.sh")
@@ -146,9 +146,9 @@ env -u WAYLAND_DISPLAY -u DISPLAY -u DBUS_SESSION_BUS_ADDRESS -u GIO_LAUNCHED_DE
   XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=GNOME \
   setsid "${runner[@]}" > "$ROOT/shell.log" 2>&1 &
 echo $! > "$ROOT/pid"
-ready_obj=/io/github/glint/Shell ready_iface=io.github.glint.Shell
+ready_obj=/io/github/lumen/Shell ready_iface=io.github.lumen.Shell
 [ "$FIRSTRUN" = 1 ] && ready_obj=/org/gnome/Shell/Extensions ready_iface=org.gnome.Shell.Extensions
-[ "$FRESH" = 1 ] && ready_obj=/io/github/glint/TestSession ready_iface=io.github.glint.TestSession
+[ "$FRESH" = 1 ] && ready_obj=/io/github/lumen/TestSession ready_iface=io.github.lumen.TestSession
 for _ in $(seq 1 100); do
   if [ -f "$ROOT/env" ] && (source "$ROOT/env"; gdbus introspect --session --dest org.gnome.Shell \
       --object-path $ready_obj 2>/dev/null | grep -q $ready_iface &&

@@ -30,8 +30,8 @@ class ScreenshotPortal:
     def capture(self, mode):
         if self.pending or self.app.session is not None:
             return
-        self.app.withdraw_notification('glint-setup')
-        token = 'glint_' + uuid.uuid4().hex
+        self.app.withdraw_notification('lumen-setup')
+        token = 'lumen_' + uuid.uuid4().hex
         sender = self.bus.get_unique_name().lstrip(':').replace('.', '_')
         self._request_path = f'{PORTAL_PATH}/request/{sender}/{token}'
         request_path = self._request_path
@@ -108,10 +108,10 @@ class ScreenshotPortal:
                 'monitors': monitors, 'pointer': {'x': width / 2, 'y': height / 2}}
 
     def _error(self, error):
-        print(f'glint: screenshot portal: {error}', flush=True)
+        print(f'lumen: screenshot portal: {error}', flush=True)
         note = Gio.Notification.new('鹿门截图未完成')
         note.set_body('请允许系统的截图请求后重试。')
-        self.app.send_notification('glint-portal', note)
+        self.app.send_notification('lumen-portal', note)
 
     def _expired(self):
         self._timeout = 0

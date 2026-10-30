@@ -12,12 +12,12 @@
 
 <br>
 
-[![Release](https://img.shields.io/github/v/release/geekchenwu/glint?style=flat-square&label=release&labelColor=3B352F&color=B33A2B)](https://github.com/geekchenwu/glint/releases/latest)
+[![Release](https://img.shields.io/github/v/release/geekchenwu/lumen?style=flat-square&label=release&labelColor=3B352F&color=B33A2B)](https://github.com/geekchenwu/lumen/releases/latest)
 [![GNOME Shell 50](https://img.shields.io/badge/GNOME_Shell-50-97712F?style=flat-square&labelColor=3B352F&logo=gnome&logoColor=white)](#安装)
 [![Wayland](https://img.shields.io/badge/Wayland-native-97712F?style=flat-square&labelColor=3B352F&logo=wayland&logoColor=white)](#安装)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-97712F?style=flat-square&labelColor=3B352F)](LICENSE)
 
-**[下载](https://github.com/geekchenwu/glint/releases/latest)** &nbsp;·&nbsp; [功能](#功能) &nbsp;·&nbsp; [安装](#安装) &nbsp;·&nbsp; [快捷键](#快捷键) &nbsp;·&nbsp; [名字由来](#名字由来) &nbsp;·&nbsp; [English](#english)
+**[下载](https://github.com/geekchenwu/lumen/releases/latest)** &nbsp;·&nbsp; [功能](#功能) &nbsp;·&nbsp; [安装](#安装) &nbsp;·&nbsp; [快捷键](#快捷键) &nbsp;·&nbsp; [名字由来](#名字由来) &nbsp;·&nbsp; [English](#english)
 
 </div>
 
@@ -50,23 +50,20 @@
 
 ## 安装
 
-从 [Releases](https://github.com/geekchenwu/glint/releases/latest) 下载，二选一：
+从 [Releases](https://github.com/geekchenwu/lumen/releases/latest) 下载，二选一：
 
 ```sh
 # 单文件安装器：校验内嵌的安装包，用 APT 补齐依赖
-sh Lumen-1.3.0.run
+sh Lumen-1.4.0.run
 
 # 或者 Debian 包
-sudo apt install ./glint_1.3.0_all.deb
-glint activate
+sudo apt install ./lumen_1.4.0_all.deb
+lumen activate
 ```
 
 以普通桌面用户运行安装器，不要用 root 启动图形应用。
 
 装好就能截图：GNOME 还没加载扩展时，鹿门会先借用系统截图门户，首次使用请允许系统的截图请求。顶栏菜单、窗口识别、保留展开的菜单、贴图置顶等原生能力，在下次注销并重新登录后生效，升级扩展也一样。完整说明见 [安装指南](packaging/INSTALL.md)。
-
-> [!NOTE]
-> 1.3.0 起改名为鹿门 Lumen，只改了显示名称：仓库、软件包与命令仍叫 `glint`，设置和快捷键原样保留。
 
 **环境**：GNOME Shell 50 · Debian / Ubuntu · Python 3.12+ · GTK 4.14+
 
@@ -84,7 +81,7 @@ glint activate
 和其他截图工具（例如 Snipaste）抢同一个键时，鹿门不会擅自覆盖：冲突会保留并提示，可在设置里一键接管，原设置自动备份。恢复原来的快捷键：
 
 ```sh
-glint hotkeys restore
+lumen hotkeys restore
 ```
 
 <br clear="right">
@@ -148,9 +145,9 @@ glint hotkeys restore
 ```sh
 sudo apt install python3 python3-gi python3-gi-cairo python3-cairo \
   gir1.2-rsvg-2.0 dpkg-dev
-git clone https://github.com/geekchenwu/glint.git
-cd glint
-bash packaging/build-deb.sh   # 生成 dist/Lumen-1.3.0.run 与 dist/glint_1.3.0_all.deb
+git clone https://github.com/geekchenwu/lumen.git
+cd lumen
+bash packaging/build-deb.sh   # 生成 dist/Lumen-1.4.0.run 与 dist/lumen_1.4.0_all.deb
 ```
 
 单元测试：
@@ -167,8 +164,8 @@ bash install.sh
 
 | 目录 | 内容 |
 | :-- | :-- |
-| `app/glint_app/` | GTK 编辑器、贴图、剪贴板与首次启动逻辑 |
-| `extension/glint@chenwu.local/` | GNOME Shell 截图后端、快捷键、顶栏菜单与设置 |
+| `app/lumen_app/` | GTK 编辑器、贴图、剪贴板与首次启动逻辑 |
+| `extension/lumen@chenwu.local/` | GNOME Shell 截图后端、快捷键、顶栏菜单与设置 |
 | `data/` · `fonts/` | 图标、桌面集成与字体 |
 | `packaging/` · `tools/` | Debian 打包、单文件安装器与图标生成 |
 | `dev/` | 单元测试、隔离 GNOME 会话与端到端回归工具 |
@@ -181,8 +178,7 @@ bash install.sh
 
 **Lumen** (鹿门, *lù mén*) is a screenshot, annotation and pinning tool for GNOME Shell 50 on Debian and Ubuntu.
 It captures inside GNOME Shell, so open menus and popups stay in the shot.
-Download `Lumen-1.3.0.run` or `glint_1.3.0_all.deb` from [Releases](https://github.com/geekchenwu/glint/releases/latest);
-the package and the command are still called `glint`.
+Download `Lumen-1.4.0.run` or `lumen_1.4.0_all.deb` from [Releases](https://github.com/geekchenwu/lumen/releases/latest).
 
 <kbd>F1</kbd> capture and annotate · <kbd>Ctrl</kbd> <kbd>F1</kbd> capture to the clipboard ·
 <kbd>F3</kbd> pin the clipboard image or text · <kbd>Shift</kbd> <kbd>F3</kbd> hide or show all pins.

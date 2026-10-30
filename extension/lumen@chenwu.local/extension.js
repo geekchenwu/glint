@@ -1,13 +1,13 @@
-// Glint - shell half.
+// Lumen - shell half.
 //
 // Snipaste-style tools launched from a gsd-media-keys custom shortcut are slow
 // (process start + portal round trip) and never see Shell popups, because
-// custom shortcuts are filtered while a menu holds its grab. Glint instead
+// custom shortcuts are filtered while a menu holds its grab. Lumen instead
 // grabs the stage from inside the compositor the moment the key is pressed,
 // freezes that frame on screen and opens the resident GTK editor over it
 // straight away; lossless image tiles follow in the background. Wayland
 // clients cannot keep themselves above other windows or choose their
-// position, so the extension does that for Glint's windows.
+// position, so the extension does that for Lumen's windows.
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -27,13 +27,13 @@ Gio._promisify(Gio.DBusConnection.prototype, 'call');
 Gio._promisify(Gio.OutputStream.prototype, 'write_bytes_async');
 Gio._promisify(Gio.OutputStream.prototype, 'close_async');
 
-const APP_ID = 'io.github.glint.Glint';
-const APP_PATH = '/io/github/glint/Glint/Daemon';
-const APP_IFACE = 'io.github.glint.Daemon';
-const SHELL_PATH = '/io/github/glint/Shell';
+const APP_ID = 'io.github.lumen.Lumen';
+const APP_PATH = '/io/github/lumen/Lumen/Daemon';
+const APP_IFACE = 'io.github.lumen.Daemon';
+const SHELL_PATH = '/io/github/lumen/Shell';
 const CAPTURE_TILE_SIZE = 1024;
 
-// Must match DIM in app/glint_app/theme.py so the hand-off is seamless.
+// Must match DIM in app/lumen_app/theme.py so the hand-off is seamless.
 const DIM = 'rgba(8, 9, 12, 0.5)';
 
 const KEY_MODES = Shell.ActionMode.ALL &
@@ -41,7 +41,7 @@ const KEY_MODES = Shell.ActionMode.ALL &
       Shell.ActionMode.LOGIN_SCREEN);
 
 const SHELL_IFACE = `<node>
-  <interface name="io.github.glint.Shell">
+  <interface name="io.github.lumen.Shell">
     <method name="Capture"><arg type="s" direction="in" name="mode"/></method>
     <method name="Pin"/>
     <method name="TogglePins"/>
@@ -78,7 +78,7 @@ function nowUs() {
     return GLib.get_monotonic_time();
 }
 
-export default class GlintExtension extends Extension {
+export default class LumenExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
         this._overlays = new Set();
@@ -89,12 +89,12 @@ export default class GlintExtension extends Extension {
         this._encoding = null;
         this._freezeTimeoutId = 0;
         // Only talk to the editor installed alongside this extension:
-        // <share>/gnome-shell/extensions/<uuid> pairs with <share>/glint, which
-        // is ~/.local/share/glint for a user install and /usr/share/glint for
+        // <share>/gnome-shell/extensions/<uuid> pairs with <share>/lumen, which
+        // is ~/.local/share/lumen for a user install and /usr/share/lumen for
         // the package.
         const shareDir = [1, 2, 3].reduce(dir => GLib.path_get_dirname(dir), this.path);
-        this._trustedDir = `${GLib.build_filenamev([shareDir, 'glint'])}/`;
-        this._captureDir = GLib.build_filenamev([GLib.get_user_runtime_dir(), 'glint']);
+        this._trustedDir = `${GLib.build_filenamev([shareDir, 'lumen'])}/`;
+        this._captureDir = GLib.build_filenamev([GLib.get_user_runtime_dir(), 'lumen']);
         GLib.mkdir_with_parents(this._captureDir, 0o700);
 
         const bind = (name, handler) =>
@@ -200,7 +200,7 @@ export default class GlintExtension extends Extension {
             await this._callApp('Pixels',
                 new GLib.Variant('(ss)', [path, JSON.stringify({tiles, start: t0})]));
             const ms = us => (us / 1000).toFixed(1);
-            console.log(`glint: capture grab ${ms(tGrab - t0)} ms, begin ${ms(tBegin - tGrab)} ms, ` +
+            console.log(`lumen: capture grab ${ms(tGrab - t0)} ms, begin ${ms(tBegin - tGrab)} ms, ` +
                 `shown ${ms(tShown - t0)} ms, encode ${ms(tEncode - tShown)} ms, ` +
                 `pixels sent ${ms(nowUs() - t0)} ms after F1`);
         } catch (e) {
@@ -218,7 +218,7 @@ export default class GlintExtension extends Extension {
                 // The editor cannot finish without the pixels.
                 for (const win of this._overlays)
                     win.delete(global.get_current_time());
-                logError(e, 'glint: capture failed');
+                logError(e, 'lumen: capture failed');
                 Main.notifyError('鹿门', `截图失败：${e.message}`);
             }
         } finally {
@@ -464,7 +464,7 @@ export default class GlintExtension extends Extension {
             else
                 await this._callApp('PinLast', null);
         } catch (e) {
-            logError(e, 'glint: pin failed');
+            logError(e, 'lumen: pin failed');
         }
     }
 
@@ -502,7 +502,7 @@ export default class GlintExtension extends Extension {
         try {
             pid = await this._ownerPid();
         } catch {
-            const launcher = `${this._trustedDir}glint`;
+            const launcher = `${this._trustedDir}lumen`;
             Gio.Subprocess.new([launcher, '--daemon'], Gio.SubprocessFlags.NONE);
             await this._waitForOwner(8000);
             pid = await this._ownerPid();
@@ -519,7 +519,7 @@ export default class GlintExtension extends Extension {
             null, Gio.DBusCallFlags.NO_AUTO_START, 10000, null);
     }
 
-    // ---- managing Glint's own windows --------------------------------
+    // ---- managing Lumen's own windows --------------------------------
 
     _watchWindow(win) {
         if (!win || this._watched.has(win))
@@ -547,18 +547,18 @@ export default class GlintExtension extends Extension {
     }
 
     _classify(win) {
-        if (win._glintRole)
+        if (win._lumenRole)
             return;
         const appId = win.get_gtk_application_id?.() || win.get_wm_class();
         const title = win.get_title() ?? '';
-        if (appId !== APP_ID || !title.startsWith('glint-'))
+        if (appId !== APP_ID || !title.startsWith('lumen-'))
             return;
         const actor = win.get_compositor_private();
         if (!actor)
             return;
 
-        if (title.startsWith('glint-overlay')) {
-            win._glintRole = 'overlay';
+        if (title.startsWith('lumen-overlay')) {
+            win._lumenRole = 'overlay';
             this._overlays.add(win);
             Main.wm.skipNextEffect(actor);
             const id = actor.connect('first-frame', () => {
@@ -575,8 +575,8 @@ export default class GlintExtension extends Extension {
                     return GLib.SOURCE_REMOVE;
                 });
             });
-        } else if (title.startsWith('glint-pin')) {
-            win._glintRole = 'pin';
+        } else if (title.startsWith('lumen-pin')) {
+            win._lumenRole = 'pin';
             Main.wm.skipNextEffect(actor);
             actor.opacity = 0;
             const place = () => {
@@ -628,7 +628,7 @@ export default class GlintExtension extends Extension {
         this._captureStart = 0;
         if (start)
             this._once(global.stage, 'after-paint', () => console.log(
-                `glint: selection shown ${((nowUs() - start) / 1000).toFixed(1)} ms after F1`));
+                `lumen: selection shown ${((nowUs() - start) / 1000).toFixed(1)} ms after F1`));
     }
 
     // ---- indicator -----------------------------------------------------
@@ -647,7 +647,7 @@ export default class GlintExtension extends Extension {
     _buildIndicator() {
         const button = new PanelMenu.Button(0.5, '鹿门', false);
         const icon = new St.Icon({
-            gicon: Gio.icon_new_for_string(`${this.path}/icons/glint.svg`),
+            gicon: Gio.icon_new_for_string(`${this.path}/icons/lumen.svg`),
             style_class: 'system-status-icon',
         });
         // Ubuntu's AppIndicator extension can enlarge tray icons and, in compact
@@ -724,7 +724,7 @@ export default class GlintExtension extends Extension {
                 new GLib.Variant('(s)', [APP_ID]), new GLib.VariantType('(s)'),
                 Gio.DBusCallFlags.NONE, -1, null);
             if (reply.deepUnpack()[0] !== invocation.get_sender())
-                throw new Error('caller is not the Glint editor');
+                throw new Error('caller is not the Lumen editor');
             await this._ensureApp();
             x = Math.min(Math.max(0, x), global.stage.width - 1);
             y = Math.min(Math.max(0, y), global.stage.height - 1);

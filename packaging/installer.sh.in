@@ -10,10 +10,10 @@ case "${1:-}" in
 esac
 
 script=$(realpath -- "$0")
-work=$(mktemp -d "${TMPDIR:-/tmp}/glint-installer.XXXXXX")
+work=$(mktemp -d "${TMPDIR:-/tmp}/lumen-installer.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-package="$work/glint_@VERSION@_all.deb"
-payload=$(awk '/^__GLINT_DEB_PAYLOAD__$/ { print NR + 1; exit }' "$script")
+package="$work/lumen_@VERSION@_all.deb"
+payload=$(awk '/^__LUMEN_DEB_PAYLOAD__$/ { print NR + 1; exit }' "$script")
 [ -n "$payload" ] || { echo "Incomplete Lumen installer." >&2; exit 1; }
 tail -n +"$payload" "$script" | base64 --decode > "$package"
 printf '%s  %s\n' '@SHA256@' "$package" | sha256sum --check --status
@@ -49,9 +49,9 @@ else
 fi
 
 if [ "$(id -u)" -ne 0 ] && [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
-  /usr/share/glint/glint activate
+  /usr/share/lumen/lumen activate
 else
   echo "Lumen is installed. Open Lumen from the applications menu to start."
 fi
 exit 0
-__GLINT_DEB_PAYLOAD__
+__LUMEN_DEB_PAYLOAD__

@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # End-to-end run in the headless shell: open a GTK client menu, press F1
 # while it is open, select, annotate, pin. Screenshots land in
-# /tmp/glint-shots/<run>-NN-*.png (unique names per run).
+# /tmp/lumen-shots/<run>-NN-*.png (unique names per run).
 #   dev/headless.sh start && dev/reload.sh && dev/e2e.sh
 set -euo pipefail
 DEV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source /tmp/glint-hl/env
+source /tmp/lumen-hl/env
 RUN="${1:-$(date +%H%M%S)}"
-OUT=/tmp/glint-shots
+OUT=/tmp/lumen-shots
 mkdir -p "$OUT"
 ctl() { python3 "$DEV/ctl.py" "$@"; }
 shot() { ctl shot "$OUT/$RUN-$1.png"; echo "$OUT/$RUN-$1.png"; }
 
 pkill -f '^python3 \S*testapp\.py$' || true
-: > /tmp/glint-hl/testapp.log
+: > /tmp/lumen-hl/testapp.log
 "$DEV/subject.sh"
 sleep 1.5
 ctl key Escape            # leave the overview shown at startup
@@ -22,7 +22,7 @@ ctl click 960 700         # focus the subject window
 for _ in 1 2 3 4 5; do    # open its hamburger menu (xdg_popup)
   ctl click 1267 318
   sleep 0.6
-  tail -1 /tmp/glint-hl/testapp.log | grep -q 'menu active True' && break
+  tail -1 /tmp/lumen-hl/testapp.log | grep -q 'menu active True' && break
 done
 shot 01-menu
 
@@ -52,6 +52,6 @@ ctl move 900 500; ctl scroll -1; ctl scroll -1
 sleep 0.3
 shot 06-pin-zoom
 
-echo "--- app.log tracebacks: $(grep -c Traceback /tmp/glint-hl/app.log || true)"
-grep 'glint:' /tmp/glint-hl/shell.log | tail -1
-cat /tmp/glint-hl/testapp.log
+echo "--- app.log tracebacks: $(grep -c Traceback /tmp/lumen-hl/app.log || true)"
+grep 'lumen:' /tmp/lumen-hl/shell.log | tail -1
+cat /tmp/lumen-hl/testapp.log

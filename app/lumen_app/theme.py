@@ -69,42 +69,42 @@ def load_fonts():
 
 
 CSS = f"""
-window.glint-overlay {{ background: black; }}
+window.lumen-overlay {{ background: black; }}
 /* The shell paints the frozen frame under these (Session.backdrop). */
-window.glint-overlay.shell-backdrop {{ background: transparent; }}
+window.lumen-overlay.shell-backdrop {{ background: transparent; }}
 
-.glint-bar {{
+.lumen-bar {{
   background: rgba(18, 19, 22, 0.94);
   border-radius: 14px;
   padding: 5px;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.3),
               inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }}
-.glint-bar button {{
+.lumen-bar button {{
   min-width: 34px; min-height: 34px; padding: 0; margin: 0 1px;
   border-radius: 9px; border: none; box-shadow: none; outline: none;
   background: transparent; color: #E8EAED;
   transition: background 120ms ease, color 120ms ease;
 }}
-.glint-bar button:hover {{ background: rgba(255, 255, 255, 0.09); }}
-.glint-bar button:active {{ background: rgba(255, 255, 255, 0.14); }}
-.glint-bar button:checked {{ background: {ACCENT}; color: {INK}; }}
-.glint-bar button.primary {{ background: {ACCENT}; color: {INK}; min-width: 40px; }}
-.glint-bar button.primary:hover {{ background: {ACCENT_HOVER}; }}
-.glint-bar button.danger:hover {{ background: rgba(255, 61, 46, 0.22); color: #FF8A80; }}
-.glint-bar button:disabled {{ color: rgba(232, 234, 237, 0.28); }}
-.glint-bar .sep {{ min-width: 1px; background: rgba(255, 255, 255, 0.10); margin: 8px 5px; }}
+.lumen-bar button:hover {{ background: rgba(255, 255, 255, 0.09); }}
+.lumen-bar button:active {{ background: rgba(255, 255, 255, 0.14); }}
+.lumen-bar button:checked {{ background: {ACCENT}; color: {INK}; }}
+.lumen-bar button.primary {{ background: {ACCENT}; color: {INK}; min-width: 40px; }}
+.lumen-bar button.primary:hover {{ background: {ACCENT_HOVER}; }}
+.lumen-bar button.danger:hover {{ background: rgba(255, 61, 46, 0.22); color: #FF8A80; }}
+.lumen-bar button:disabled {{ color: rgba(232, 234, 237, 0.28); }}
+.lumen-bar .sep {{ min-width: 1px; background: rgba(255, 255, 255, 0.10); margin: 8px 5px; }}
 
-.glint-props button {{ min-width: 30px; min-height: 30px; border-radius: 8px; }}
-.glint-props button:checked {{ background: rgba(255, 255, 255, 0.14); color: #fff; }}
+.lumen-props button {{ min-width: 30px; min-height: 30px; border-radius: 8px; }}
+.lumen-props button:checked {{ background: rgba(255, 255, 255, 0.14); color: #fff; }}
 
-.glint-text-editor {{
+.lumen-text-editor {{
   border: 1px dashed {rgba(ACCENT, 0.85).to_string()};
   border-radius: 4px;
   padding: 2px 4px;
   background: rgba(0, 0, 0, 0.0);
 }}
-.glint-text-editor textview, .glint-text-editor textview text {{
+.lumen-text-editor textview, .lumen-text-editor textview text {{
   background: transparent;
   caret-color: {ACCENT};
 }}
@@ -117,19 +117,19 @@ tooltip.background {{
 }}
 tooltip label {{ color: #E8EAED; font-family: "{SANS}", "Noto Sans CJK SC"; font-size: 12px; }}
 
-window.glint-pin {{ background: transparent; }}
-window.glint-pin > .titlebar {{
+window.lumen-pin {{ background: transparent; }}
+window.lumen-pin > .titlebar {{
   min-height: 0; min-width: 0; padding: 0; margin: 0;
   border: none; background: none; box-shadow: none;
 }}
-window.glint-pin.csd {{
+window.lumen-pin.csd {{
   border-radius: 6px;
   box-shadow: 0 0 0 1px {rgba(ACCENT, 0.95).to_string()}, 0 14px 34px rgba(0, 0, 0, 0.42);
 }}
-window.glint-pin.csd:backdrop {{
+window.lumen-pin.csd:backdrop {{
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22), 0 8px 22px rgba(0, 0, 0, 0.32);
 }}
-.glint-osd {{
+.lumen-osd {{
   background: rgba(18, 19, 22, 0.88);
   color: {ACCENT};
   border-radius: 999px;
@@ -139,14 +139,14 @@ window.glint-pin.csd:backdrop {{
   font-size: 12px;
   font-weight: 600;
 }}
-popover.glint-menu contents {{
+popover.lumen-menu contents {{
   background: rgba(18, 19, 22, 0.97);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }}
-popover.glint-menu modelbutton {{ color: #E8EAED; border-radius: 7px; min-height: 30px; }}
-popover.glint-menu modelbutton:hover {{ background: rgba(255, 255, 255, 0.09); }}
-popover.glint-menu accelerator {{ color: rgba(232, 234, 237, 0.45); font-family: "{MONO}"; }}
+popover.lumen-menu modelbutton {{ color: #E8EAED; border-radius: 7px; min-height: 30px; }}
+popover.lumen-menu modelbutton:hover {{ background: rgba(255, 255, 255, 0.09); }}
+popover.lumen-menu accelerator {{ color: rgba(232, 234, 237, 0.45); font-family: "{MONO}"; }}
 """
 
 

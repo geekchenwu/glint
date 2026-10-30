@@ -2,15 +2,12 @@
 
 Supported desktop: GNOME Shell 50 on Debian/Ubuntu with GTK 4.14 or newer.
 
-Lumen (鹿门) was called Glint before 1.3.0. Its package and command are still
-`glint`, so upgrading keeps shortcuts and settings.
-
 ## Recommended installer
 
 Run the versioned installer as your normal desktop user:
 
 ```sh
-sh Lumen-1.3.0.run
+sh Lumen-1.4.0.run
 ```
 
 It contains the Debian package, verifies its checksum, and asks for administrator
@@ -27,8 +24,8 @@ The `.deb` declares the same complete dependency list. Use a package manager tha
 resolves dependencies:
 
 ```sh
-sudo apt install ./glint_1.3.0_all.deb
-glint activate
+sudo apt install ./lumen_1.4.0_all.deb
+lumen activate
 ```
 
 Opening Lumen from the application menu also activates it and starts a capture.
@@ -44,7 +41,7 @@ save, and basic clipboard pinning work in this mode.
 
 Unoccupied F1, Ctrl+F1, F3, and Shift+F3 shortcuts are registered for this session.
 Existing custom shortcuts are preserved, and Lumen offers to back up and take
-over conflicts. `glint hotkeys restore` restores that backup.
+over conflicts. `lumen hotkeys restore` restores that backup.
 
 The native top bar indicator, window/menu detection, capturing open menus, and
 always-on-top pins become available at the next normal login. Lumen then removes

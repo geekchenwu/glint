@@ -14,7 +14,7 @@ import gi
 gi.require_version('Rsvg', '2.0')
 from gi.repository import Rsvg  # noqa: E402
 
-APP_ID = 'io.github.glint.Glint'
+APP_ID = 'io.github.lumen.Lumen'
 HERE = os.path.dirname(os.path.abspath(__file__))
 ICONS = os.path.join(HERE, '..', 'data', 'icons')
 SIZES = (16, 24, 32, 48, 64, 128, 256, 512)

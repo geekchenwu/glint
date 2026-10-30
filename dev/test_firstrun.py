@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from gi.repository import Gio
 
-from glint_app import firstrun
+from lumen_app import firstrun
 
 
 class FirstRunTests(unittest.TestCase):

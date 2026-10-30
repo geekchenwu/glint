@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.glint.Glint</id>
+  <id>io.github.lumen.Lumen</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <developer id="io.github.glint">
+  <developer id="io.github.lumen">
     <name>chenwu</name>
   </developer>
   <update_contact>geekchenwu@gmail.com</update_contact>
@@ -25,7 +25,7 @@
       <li>Pin captures or clipboard contents on top of every window; zoom and fade them</li>
     </ul>
   </description>
-  <launchable type="desktop-id">io.github.glint.Glint.desktop</launchable>
+  <launchable type="desktop-id">io.github.lumen.Lumen.desktop</launchable>
   <categories>
     <category>Utility</category>
     <category>Graphics</category>
@@ -38,7 +38,7 @@
     <keyword xml:lang="zh_CN">贴图</keyword>
   </keywords>
   <provides>
-    <binary>glint</binary>
+    <binary>lumen</binary>
   </provides>
   <requires>
     <display_length compare="ge">768</display_length>
@@ -49,9 +49,14 @@
   </supports>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="1.4.0" date="2026-10-30">
+      <description>
+        <p>Packaging and documentation update.</p>
+      </description>
+    </release>
     <release version="1.3.0" date="2026-10-30">
       <description>
-        <p>Rename the app to Lumen (鹿门). The package, the glint command, settings and shortcuts carry over unchanged.</p>
+        <p>Save screenshots as Lumen_&lt;date&gt;.png.</p>
       </description>
     </release>
     <release version="1.2.3" date="2026-10-30">
@@ -66,7 +71,7 @@
     </release>
     <release version="1.2.1" date="2026-10-26">
       <description>
-        <p>Introduce an orange crop-frame G icon and warm orange selection controls. Add author email, mail launch and copy actions to preferences.</p>
+        <p>Introduce an orange crop-frame icon and warm orange selection controls. Add author email, mail launch and copy actions to preferences.</p>
       </description>
     </release>
     <release version="1.2.0" date="2026-10-26">

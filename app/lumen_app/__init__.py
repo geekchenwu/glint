@@ -1,0 +1,6 @@
+VERSION = '1.4.0'
+APP_ID = 'io.github.lumen.Lumen'
+DAEMON_PATH = '/io/github/lumen/Lumen/Daemon'
+DAEMON_IFACE = 'io.github.lumen.Daemon'
+SHELL_PATH = '/io/github/lumen/Shell'
+SHELL_IFACE = 'io.github.lumen.Shell'

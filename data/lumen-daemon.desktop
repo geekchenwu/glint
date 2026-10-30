@@ -2,8 +2,8 @@
 Type=Application
 Name=Lumen daemon
 Comment=Keeps the Lumen editor resident so captures open instantly
-Exec=@GLINT@ --daemon
-Icon=io.github.glint.Glint
+Exec=@LUMEN@ --daemon
+Icon=io.github.lumen.Lumen
 NoDisplay=true
 Terminal=false
 X-GNOME-Autostart-enabled=true

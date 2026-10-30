@@ -74,7 +74,7 @@ def unique_path(directory):
     return path
 
 
-class GlintApp(Gtk.Application):
+class LumenApp(Gtk.Application):
     def __init__(self):
         super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
         self.session = None
@@ -85,7 +85,7 @@ class GlintApp(Gtk.Application):
         self.style = {'color': theme.PALETTE[0],
                       'sizes': {'stroke': 1, 'marker': 1, 'text': 1, 'mosaic': 1, 'step': 1}}
         self._registration = 0
-        self._capture_dir = os.path.join(GLib.get_user_runtime_dir(), 'glint')
+        self._capture_dir = os.path.join(GLib.get_user_runtime_dir(), 'lumen')
         self._portal = None
         self._clipboard_reader = None
 
@@ -125,7 +125,7 @@ class GlintApp(Gtk.Application):
         if info.get('state') == 1 and info.get('enabled'):
             firstrun.remove_fallback_shortcuts()
             firstrun.State().set('extension-enabled')
-            self.withdraw_notification('glint-setup')
+            self.withdraw_notification('lumen-setup')
 
     def _first_run(self):
         state = firstrun.State()
@@ -137,7 +137,7 @@ class GlintApp(Gtk.Application):
             start = f'现在即可按 {binding} 截图。' if binding else '从应用菜单打开鹿门即可截图。'
             note.set_body(start + '首次使用请允许系统截图请求；'
                           '菜单抓取、贴图置顶等增强功能将在下次正常登录后自动启用。')
-            self.send_notification('glint-setup', note)
+            self.send_notification('lumen-setup', note)
             state.set('portal-introduced')
 
         clashes = firstrun.conflicts()
@@ -147,25 +147,25 @@ class GlintApp(Gtk.Application):
             names = '、'.join(sorted({c['name'] or c['command'] for c in clashes}))[:120]
             note = Gio.Notification.new('快捷键冲突')
             note.set_body(f'{keys} 已被「{names}」占用。交给鹿门吗？原设置会备份，'
-                          '可用 glint hotkeys restore 恢复。')
+                          '可用 lumen hotkeys restore 恢复。')
             note.add_button('交给鹿门', 'app.take-over-hotkeys')
             note.add_button('保持现状', 'app.keep-hotkeys')
             note.set_priority(Gio.NotificationPriority.HIGH)
-            self.send_notification('glint-hotkeys', note)
+            self.send_notification('lumen-hotkeys', note)
 
     def _take_over_hotkeys(self):
         taken = firstrun.take_over()
         if firstrun.extension_status() != 'enabled':
             firstrun.install_fallback_shortcuts()
         firstrun.State().set('hotkeys-decided')
-        self.withdraw_notification('glint-hotkeys')
+        self.withdraw_notification('lumen-hotkeys')
         note = Gio.Notification.new('快捷键已交给鹿门')
         note.set_body(f'已停用 {len(taken)} 个冲突的自定义快捷键，F1 截图、F3 贴图。')
-        self.send_notification('glint-hotkeys-done', note)
+        self.send_notification('lumen-hotkeys-done', note)
 
     def _keep_hotkeys(self):
         firstrun.State().set('hotkeys-decided')
-        self.withdraw_notification('glint-hotkeys')
+        self.withdraw_notification('lumen-hotkeys')
 
     def do_dbus_register(self, connection, object_path):
         Gtk.Application.do_dbus_register(self, connection, object_path)
@@ -235,7 +235,7 @@ class GlintApp(Gtk.Application):
         if self.session is not None:
             self.session.close()
         self.session = Session(self, cap, mode)
-        print(f'glint: decode {1000 * (t1 - t0):.0f} ms, session {1000 * (time.monotonic() - t1):.0f} ms, '
+        print(f'lumen: decode {1000 * (t1 - t0):.0f} ms, session {1000 * (time.monotonic() - t1):.0f} ms, '
               f'shell {cap.meta.get("timing")}', flush=True)
 
     def begin(self, mode, meta_json):
@@ -245,7 +245,7 @@ class GlintApp(Gtk.Application):
         if self.session is not None:
             self.session.close()
         self.session = Session(self, cap, mode, backdrop=True)
-        print(f'glint: session {1000 * (time.monotonic() - t0):.0f} ms', flush=True)
+        print(f'lumen: session {1000 * (time.monotonic() - t0):.0f} ms', flush=True)
 
     def pixels(self, path, meta_json):
         session = self.session
@@ -262,11 +262,11 @@ class GlintApp(Gtk.Application):
 
         def ready(pixbuf, error):
             if error is not None:
-                print(f'glint: cannot read capture: {error}', flush=True)
+                print(f'lumen: cannot read capture: {error}', flush=True)
                 session.close()
             elif not session.closed:
                 session.set_pixels(pixbuf)
-                print(f'glint: decode {1000 * (time.monotonic() - t0):.0f} ms, pixels ready '
+                print(f'lumen: decode {1000 * (time.monotonic() - t0):.0f} ms, pixels ready '
                       f'{(GLib.get_monotonic_time() - meta["start"]) / 1000:.0f} ms after F1', flush=True)
             return GLib.SOURCE_REMOVE
 
@@ -389,7 +389,7 @@ class GlintApp(Gtk.Application):
         note.set_body(os.path.basename(path))
         note.set_default_action_and_target_value('app.open-file', GLib.Variant('s', path))
         note.add_button('打开文件夹', 'app.open-folder')
-        self.send_notification('glint-saved', note)
+        self.send_notification('lumen-saved', note)
 
     def _open_file(self, _action, param):
         Gio.AppInfo.launch_default_for_uri(Gio.File.new_for_path(param.get_string()).get_uri(), None)
@@ -417,7 +417,7 @@ class GlintApp(Gtk.Application):
         try:
             texture = render.pixbuf_texture(GdkPixbuf.Pixbuf.new_from_file(path))
         except GLib.Error as e:
-            print(f'glint: cannot pin {path}: {e.message}', flush=True)
+            print(f'lumen: cannot pin {path}: {e.message}', flush=True)
             return
         finally:
             try:
@@ -485,4 +485,4 @@ def text_card(text, scale=2.0):
 
 
 def run(argv):
-    return GlintApp().run(argv)
+    return LumenApp().run(argv)

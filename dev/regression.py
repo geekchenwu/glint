@@ -2,7 +2,7 @@
 """Real screenshot, cross-process paste and panel geometry checks.
 
 dev/headless.sh start && dev/reload.sh
-source /tmp/glint-hl/env && python3 dev/regression.py
+source /tmp/lumen-hl/env && python3 dev/regression.py
 """
 import json
 import os
@@ -19,7 +19,7 @@ import ctl
 
 def state():
     result = ctl.bus.call_sync(
-        'org.gnome.Shell', '/io/github/glint/Shell', 'io.github.glint.Shell',
+        'org.gnome.Shell', '/io/github/lumen/Shell', 'io.github.lumen.Shell',
         'DebugState', None, None, Gio.DBusCallFlags.NONE, 1000, None)
     return json.loads(result.unpack()[0])
 
@@ -38,9 +38,9 @@ def control(*args):
 
 
 def main():
-    if os.environ.get('XDG_RUNTIME_DIR') != '/tmp/glint-hl/run':
+    if os.environ.get('XDG_RUNTIME_DIR') != '/tmp/lumen-hl/run':
         raise SystemExit('Run only in the isolated dev/headless.sh session.')
-    with tempfile.TemporaryDirectory(prefix='glint-paste-') as temp:
+    with tempfile.TemporaryDirectory(prefix='lumen-paste-') as temp:
         output = Path(temp) / 'paste.json'
         receiver = subprocess.Popen([
             sys.executable, str(Path(__file__).with_name('clipboard_receiver.py')), str(output)])
@@ -69,7 +69,7 @@ def main():
                     control('key', 't', 'ctrl')
                 wait_for(lambda: state()['overlays'] == 0)
                 if action == 'pin':
-                    wait_for(lambda: (state()['focus'] or '').startswith('glint-pin'))
+                    wait_for(lambda: (state()['focus'] or '').startswith('lumen-pin'))
                     time.sleep(.15)
                 output.unlink(missing_ok=True)
                 control('click', cx, cy + 120)
@@ -101,9 +101,9 @@ def main():
             # retaining its borrowed GBytes past the callback can crash Shell.
             for _ in range(3):
                 control('key', 'F3')
-                wait_for(lambda: (state()['focus'] or '').startswith('glint-pin'))
+                wait_for(lambda: (state()['focus'] or '').startswith('lumen-pin'))
                 control('key', 'Escape')
-                wait_for(lambda: not (state()['focus'] or '').startswith('glint-pin'))
+                wait_for(lambda: not (state()['focus'] or '').startswith('lumen-pin'))
             print('F3: three clipboard image pins without a Shell restart', flush=True)
 
             indicator = state()['indicator']
@@ -119,12 +119,12 @@ def main():
             edge_clamped = (menu_center < icon_center and
                             0 <= initial['stage']['width'] - menu['x'] - menu['width'] <= 8)
             assert offset <= 2 or edge_clamped, (indicator, menu, offset)
-            control('shot', '/tmp/glint-menu-centered.png')
+            control('shot', '/tmp/lumen-menu-centered.png')
             control('key', 'Escape')
             print(f'indicator menu: center offset {offset:.1f} px; edge clamp={edge_clamped}', flush=True)
             # The first window also initializes GTK's renderer and font caches.
             assert durations[0] < 2500 and max(durations[1:]) < 1500, durations
-            assert not list(Path('/tmp/glint-hl/run/glint').glob('capture-*'))
+            assert not list(Path('/tmp/lumen-hl/run/lumen').glob('capture-*'))
         finally:
             receiver.terminate()
             receiver.wait(timeout=5)

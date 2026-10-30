@@ -13,7 +13,7 @@ gi.require_version('Gdk', '4.0')
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf, GLib
 
-from glint_app.render import Capture, load_tiles, render_region
+from lumen_app.render import Capture, load_tiles, render_region
 
 
 class CaptureTests(unittest.TestCase):

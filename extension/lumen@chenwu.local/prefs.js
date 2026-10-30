@@ -1,4 +1,4 @@
-// Glint preferences: shortcuts, top bar indicator, shortcut clashes.
+// Lumen preferences: shortcuts, top bar indicator, shortcut clashes.
 import Adw from 'gi://Adw';
 import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
@@ -52,7 +52,7 @@ function shortcutDialog(parent, title, onDone) {
     dialog.present(parent);
 }
 
-export default class GlintPreferences extends ExtensionPreferences {
+export default class LumenPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         // Shell keeps session metadata cached when an installed extension changes.
@@ -61,7 +61,7 @@ export default class GlintPreferences extends ExtensionPreferences {
         window.set_default_size(560, 720);
         window.set_search_enabled(false);
 
-        const page = new Adw.PreferencesPage({title: '鹿门', icon_name: 'io.github.glint.Glint-symbolic'});
+        const page = new Adw.PreferencesPage({title: '鹿门', icon_name: 'io.github.lumen.Lumen-symbolic'});
         window.add(page);
 
         // Header.
@@ -72,10 +72,10 @@ export default class GlintPreferences extends ExtensionPreferences {
         });
         const icon = new Gtk.Image({pixel_size: 112});
         const themeIcons = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
-        if (themeIcons.has_icon('io.github.glint.Glint'))
-            icon.icon_name = 'io.github.glint.Glint';
+        if (themeIcons.has_icon('io.github.lumen.Lumen'))
+            icon.icon_name = 'io.github.lumen.Lumen';
         else
-            icon.gicon = Gio.icon_new_for_string(`${this.path}/icons/glint.svg`);
+            icon.gicon = Gio.icon_new_for_string(`${this.path}/icons/lumen.svg`);
         box.append(icon);
         box.append(new Gtk.Label({label: '鹿门 Lumen', css_classes: ['title-1']}));
         box.append(new Gtk.Label({
@@ -111,8 +111,8 @@ export default class GlintPreferences extends ExtensionPreferences {
         page.add(keys);
 
         // Shortcut clashes with Snipaste and friends.
-        const glint = GLib.find_program_in_path('glint');
-        if (glint) {
+        const lumen = GLib.find_program_in_path('lumen');
+        if (lumen) {
             const clash = new Adw.PreferencesGroup({
                 title: '快捷键冲突',
                 description: '其他截图工具（例如 Snipaste）的自定义快捷键会和鹿门抢同一个键。',
@@ -126,7 +126,7 @@ export default class GlintPreferences extends ExtensionPreferences {
                 subtitle: '撤销上一步，重新启用被停用的快捷键',
             });
             const run = (args, done) => {
-                const proc = Gio.Subprocess.new([glint, ...args],
+                const proc = Gio.Subprocess.new([lumen, ...args],
                     Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_MERGE);
                 proc.communicate_utf8_async(null, null, (p, res) => {
                     const [, out] = p.communicate_utf8_finish(res);
