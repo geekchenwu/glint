@@ -70,6 +70,8 @@ def load_fonts():
 
 CSS = f"""
 window.glint-overlay {{ background: black; }}
+/* The shell paints the frozen frame under these (Session.backdrop). */
+window.glint-overlay.shell-backdrop {{ background: transparent; }}
 
 .glint-bar {{
   background: rgba(18, 19, 22, 0.94);

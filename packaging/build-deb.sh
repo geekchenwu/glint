@@ -34,7 +34,7 @@ chmod 755 "$root/usr/bin/glint"
 ext="$share/gnome-shell/extensions/$UUID"
 install -d "$ext/icons" "$share/glib-2.0/schemas"
 install -m 644 "$SRC/extension/$UUID"/{metadata.json,extension.js,prefs.js} "$ext/"
-install -m 644 "$SRC/extension/$UUID/icons/glint-symbolic.svg" "$ext/icons/"
+install -m 644 "$SRC/extension/$UUID/icons/glint.svg" "$ext/icons/"
 install -m 644 "$SRC/extension/$UUID/schemas/org.gnome.shell.extensions.glint.gschema.xml" \
   "$share/glib-2.0/schemas/"
 
@@ -75,7 +75,7 @@ Depends: gnome-shell (>= 50), gnome-shell (<< 51), python3 (>= 3.12), python3-gi
 Section: graphics
 Priority: optional
 Description: instant screenshots, annotation and pinning for GNOME
- Glint captures from inside GNOME Shell the moment F1 is pressed, so there
+ Lumen captures from inside GNOME Shell the moment F1 is pressed, so there
  is no start-up delay and open menus, popups and tooltips stay in the shot.
  .
  It auto-detects windows, menus and panels, offers a pixel loupe and colour
@@ -98,4 +98,4 @@ if [ "${1:-}" = "--stage" ]; then
 fi
 echo "$DIST/$PKG.deb"
 python3 "$SRC/tools/build-installer.py" "$SRC/packaging/installer.sh.in" \
-  "$DIST/$PKG.deb" "$VERSION" "$DIST/Glint-$VERSION.run"
+  "$DIST/$PKG.deb" "$VERSION" "$DIST/Lumen-$VERSION.run"

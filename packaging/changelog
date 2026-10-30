@@ -1,3 +1,36 @@
+glint (1.3.0) unstable; urgency=medium
+
+  * Rename the app to Lumen (鹿门): "lumen" is Latin for light, and for an
+    opening that lets it in; Lumen and 鹿门 (lù mén) sound alike.
+  * Save screenshots as Lumen_<date>.png.
+  * The package, the glint command, the application ID, settings and
+    shortcuts, and the extension UUID stay the same, so upgrades carry
+    everything over.
+
+ -- chenwu <geekchenwu@gmail.com>  Fri, 30 Oct 2026 12:37:00 +0800
+
+glint (1.2.3) unstable; urgency=medium
+
+  * Open the selection overlay as soon as the screen is frozen instead of
+    after the whole screenshot has been encoded: GNOME Shell paints the
+    frozen frame under the transparent editor, and the lossless tiles are
+    encoded and decoded in the background. On a 4K screen, F1 to selection
+    drops from about 2.5 s to under 0.2 s.
+  * Finishing before the pixels arrive (Enter, Ctrl+C, double click)
+    completes as soon as they do; closing the editor stops the encoding.
+
+ -- chenwu <geekchenwu@gmail.com>  Fri, 30 Oct 2026 11:06:00 +0800
+
+glint (1.2.2) unstable; urgency=medium
+
+  * Replace the orange crop-frame G icon with the embossed Chiying bagua
+    emblem, with a simplified variant for sizes up to 64 px and a matching
+    symbolic icon.
+  * Show the emblem in full colour in the top bar, with the same icon size
+    and button spacing as the AppIndicator tray icons.
+
+ -- chenwu <geekchenwu@gmail.com>  Thu, 29 Oct 2026 11:28:00 +0800
+
 glint (1.2.1) unstable; urgency=medium
 
   * Replace the multi-colour glass icon with an orange crop-frame G, with

@@ -6,6 +6,7 @@ Wayland clipboard contents alive after the overlay closes.
 import json
 import math
 import os
+import threading
 import time
 
 import cairo
@@ -31,6 +32,14 @@ DAEMON_XML = f"""
       <arg type="s" name="path" direction="in"/>
       <arg type="s" name="meta" direction="in"/>
     </method>
+    <method name="Begin">
+      <arg type="s" name="mode" direction="in"/>
+      <arg type="s" name="meta" direction="in"/>
+    </method>
+    <method name="Pixels">
+      <arg type="s" name="path" direction="in"/>
+      <arg type="s" name="meta" direction="in"/>
+    </method>
     <method name="PinImage"><arg type="s" name="path" direction="in"/></method>
     <method name="PinText"><arg type="s" name="text" direction="in"/></method>
     <method name="PinLast"/>
@@ -42,9 +51,9 @@ DAEMON_XML = f"""
 </node>
 """
 
-# Methods that read files from the shell's private capture directory, keyed
-# to the index of their path argument.
-SHELL_ONLY = {'Capture': 1, 'PinImage': 0}
+# Methods only GNOME Shell may call, keyed to the index of the argument that
+# names a file in its private capture directory (None: no file).
+SHELL_ONLY = {'Capture': 1, 'PinImage': 0, 'Pixels': 0, 'Begin': None}
 
 
 def screenshots_dir():
@@ -57,10 +66,10 @@ def screenshots_dir():
 
 def unique_path(directory):
     stamp = time.strftime('%Y-%m-%d_%H-%M-%S')
-    path = os.path.join(directory, f'Glint_{stamp}.png')
+    path = os.path.join(directory, f'Lumen_{stamp}.png')
     n = 2
     while os.path.exists(path):
-        path = os.path.join(directory, f'Glint_{stamp}_{n}.png')
+        path = os.path.join(directory, f'Lumen_{stamp}_{n}.png')
         n += 1
     return path
 
@@ -123,9 +132,9 @@ class GlintApp(Gtk.Application):
         status = firstrun.prepare_session()
         if (status != 'enabled' and not state.get('extension-enabled') and
                 not state.get('portal-introduced')):
-            note = Gio.Notification.new('Glint 已就绪')
+            note = Gio.Notification.new('鹿门已就绪')
             binding = firstrun.fallback_capture_binding()
-            start = f'现在即可按 {binding} 截图。' if binding else '从应用菜单打开 Glint 即可截图。'
+            start = f'现在即可按 {binding} 截图。' if binding else '从应用菜单打开鹿门即可截图。'
             note.set_body(start + '首次使用请允许系统截图请求；'
                           '菜单抓取、贴图置顶等增强功能将在下次正常登录后自动启用。')
             self.send_notification('glint-setup', note)
@@ -137,9 +146,9 @@ class GlintApp(Gtk.Application):
                                     .replace('<Shift>', 'Shift+') for c in clashes}))
             names = '、'.join(sorted({c['name'] or c['command'] for c in clashes}))[:120]
             note = Gio.Notification.new('快捷键冲突')
-            note.set_body(f'{keys} 已被「{names}」占用。交给 Glint 吗？原设置会备份，'
+            note.set_body(f'{keys} 已被「{names}」占用。交给鹿门吗？原设置会备份，'
                           '可用 glint hotkeys restore 恢复。')
-            note.add_button('交给 Glint', 'app.take-over-hotkeys')
+            note.add_button('交给鹿门', 'app.take-over-hotkeys')
             note.add_button('保持现状', 'app.keep-hotkeys')
             note.set_priority(Gio.NotificationPriority.HIGH)
             self.send_notification('glint-hotkeys', note)
@@ -150,7 +159,7 @@ class GlintApp(Gtk.Application):
             firstrun.install_fallback_shortcuts()
         firstrun.State().set('hotkeys-decided')
         self.withdraw_notification('glint-hotkeys')
-        note = Gio.Notification.new('快捷键已交给 Glint')
+        note = Gio.Notification.new('快捷键已交给鹿门')
         note.set_body(f'已停用 {len(taken)} 个冲突的自定义快捷键，F1 截图、F3 贴图。')
         self.send_notification('glint-hotkeys-done', note)
 
@@ -189,8 +198,9 @@ class GlintApp(Gtk.Application):
     def _on_call(self, connection, sender, _path, _iface, method, params, invocation):
         args = params.unpack()
         if method in SHELL_ONLY:
-            path = args[SHELL_ONLY[method]]
-            if sender != self._shell_owner(connection) or not self._private_path(path):
+            index = SHELL_ONLY[method]
+            if sender != self._shell_owner(connection) or (
+                    index is not None and not self._private_path(args[index])):
                 invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied',
                                              'only GNOME Shell may hand over captures')
                 return
@@ -198,6 +208,8 @@ class GlintApp(Gtk.Application):
         # Reply first so the shell is not kept waiting on image decoding.
         handler = {
             'Capture': lambda: self.capture(*args),
+            'Begin': lambda: self.begin(*args),
+            'Pixels': lambda: self.pixels(*args),
             'PinImage': lambda: self.pin_image(*args),
             'PinText': lambda: self.pin_text(*args),
             'PinLast': self.pin_last,
@@ -226,6 +238,54 @@ class GlintApp(Gtk.Application):
         print(f'glint: decode {1000 * (t1 - t0):.0f} ms, session {1000 * (time.monotonic() - t1):.0f} ms, '
               f'shell {cap.meta.get("timing")}', flush=True)
 
+    def begin(self, mode, meta_json):
+        """Open the editor on the capture's geometry; its pixels follow."""
+        t0 = time.monotonic()
+        cap = render.Capture(None, json.loads(meta_json))
+        if self.session is not None:
+            self.session.close()
+        self.session = Session(self, cap, mode, backdrop=True)
+        print(f'glint: session {1000 * (time.monotonic() - t0):.0f} ms', flush=True)
+
+    def pixels(self, path, meta_json):
+        session = self.session
+        if session is None or session.cap.pixbuf is not None:
+            # Closed before the shell finished encoding.
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+            return
+        meta = json.loads(meta_json)
+        width, height = session.cap.width, session.cap.height
+        t0 = time.monotonic()
+
+        def ready(pixbuf, error):
+            if error is not None:
+                print(f'glint: cannot read capture: {error}', flush=True)
+                session.close()
+            elif not session.closed:
+                session.set_pixels(pixbuf)
+                print(f'glint: decode {1000 * (time.monotonic() - t0):.0f} ms, pixels ready '
+                      f'{(GLib.get_monotonic_time() - meta["start"]) / 1000:.0f} ms after F1', flush=True)
+            return GLib.SOURCE_REMOVE
+
+        # Off the main thread: the editor is already open and in use.
+        def decode():
+            pixbuf = error = None
+            try:
+                pixbuf = render.load_tiles(path, width, height, meta['tiles'])
+            except (GLib.Error, OSError, ValueError) as e:
+                error = e
+            finally:
+                try:
+                    os.unlink(path)
+                except OSError:
+                    pass
+            GLib.idle_add(ready, pixbuf, error)
+
+        threading.Thread(target=decode, daemon=True).start()
+
     def session_closed(self, session):
         if self.session is session:
             self.session = None
@@ -241,7 +301,7 @@ class GlintApp(Gtk.Application):
             return
         # Wayland grants clipboard access to the focused client. A short-lived
         # visible window acquires that focus without any compositor privileges.
-        window = Gtk.Window(application=self, title='Glint', default_width=280,
+        window = Gtk.Window(application=self, title='鹿门', default_width=280,
                             default_height=96, resizable=False)
         window.set_child(Gtk.Label(label='正在读取剪贴板…', margin_top=20, margin_bottom=20,
                                    margin_start=20, margin_end=20))

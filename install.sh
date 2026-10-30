@@ -61,7 +61,7 @@ if [ "$TAKE_OVER" = 1 ]; then
   "$SRC/hotkeys.sh" take-over
 fi
 
-echo "Glint installed:"
+echo "Lumen installed:"
 echo "  editor     $APPDIR"
 echo "  extension  $EXTDIR"
 if [ "$ACTIVATE" = 1 ] && [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ] &&

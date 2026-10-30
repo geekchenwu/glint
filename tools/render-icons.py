@@ -3,7 +3,7 @@
 
   render-icons.py OUT_DIR             -> OUT_DIR/<size>x<size>/apps/<id>.png
   render-icons.py OUT_DIR --preview PNG
-Sizes up to 32 px come from the hinted small variant.
+Sizes up to 64 px come from the simplified small variant.
 """
 import os
 import sys
@@ -21,7 +21,7 @@ SIZES = (16, 24, 32, 48, 64, 128, 256, 512)
 
 
 def handle(size):
-    name = f'{APP_ID}-small.svg' if size <= 32 else f'{APP_ID}.svg'
+    name = f'{APP_ID}-small.svg' if size <= 64 else f'{APP_ID}.svg'
     return Rsvg.Handle.new_from_file(os.path.join(ICONS, name))
 
 

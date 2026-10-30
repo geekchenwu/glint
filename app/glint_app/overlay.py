@@ -73,10 +73,14 @@ class Target:
 
 
 class Session:
-    def __init__(self, app, cap, mode):
+    def __init__(self, app, cap, mode, backdrop=False):
         self.app = app
         self.cap = cap
         self.mode = mode
+        # The shell paints the frozen frame under the transparent overlay
+        # (extension.js), so the editor can open before cap has its pixels.
+        self.backdrop = backdrop
+        self.waiting = []
         self.f = cap.f
         self.state = 'hover'
         self.sel = None
@@ -204,6 +208,16 @@ class Session:
     def redraw(self):
         for win in self.windows:
             win.canvas.queue_draw()
+
+    def set_pixels(self, pixbuf):
+        self.cap.set_pixbuf(pixbuf)
+        self.refresh_cache()
+        self.redraw()
+        waiting, self.waiting = self.waiting, []
+        for action in waiting:
+            if self.closed:
+                break
+            action()
 
     def refresh_cache(self):
         # Rendered over the annotations' own bounds, not the selection, so
@@ -579,8 +593,12 @@ class Session:
             return 'RGB({}, {}, {})'.format(*rgb)
         return '#{:02X}{:02X}{:02X}'.format(*rgb)
 
-    def copy_color(self):
-        self.app.copy_text(self.color_string(self.cap.color_at(*self.pointer)))
+    def copy_color(self, p=None):
+        p = p or self.pointer
+        if self.cap.pixbuf is None:
+            self.waiting.append(lambda: self.copy_color(p))
+            return
+        self.app.copy_text(self.color_string(self.cap.color_at(*p)))
         self.close()
 
     def finish(self, action):
@@ -588,6 +606,10 @@ class Session:
             return
         self.commit_editor()
         if self.state != 'selected' or not self.sel:
+            return
+        if self.cap.pixbuf is None:
+            # Stay open until the pixels arrive; closing would cancel them.
+            self.waiting.append(lambda: self.finish(action))
             return
         surface = render.render_region(self.cap, self.sel, self.anns)
         texture = render.surface_texture(surface)
@@ -762,8 +784,9 @@ class Canvas(Gtk.Widget):
         f = s.f
         mx, my = self.mon['x'], self.mon['y']
         snap.push_clip(R(0, 0, w, h))
-        snap.append_scaled_texture(cap.texture, Gsk.ScalingFilter.NEAREST,
-                                   R(-mx, -my, cap.width / f, cap.height / f))
+        if not s.backdrop:
+            snap.append_scaled_texture(cap.texture, Gsk.ScalingFilter.NEAREST,
+                                       R(-mx, -my, cap.width / f, cap.height / f))
 
         bright = s.sel if s.sel else (s.hover.rect if s.hover else None)
         if s.sel and s.cache is not None:
@@ -783,8 +806,8 @@ class Canvas(Gtk.Widget):
             self._paint_guides(snap, w, h)
         if s.state == 'hover':
             self._paint_hint(snap, w, h)
-        show_loupe = s.state in ('hover', 'selecting') or (
-            s.drag is not None and s.drag['op'] in ('resize', 'new'))
+        show_loupe = cap.pixbuf is not None and (s.state in ('hover', 'selecting') or (
+            s.drag is not None and s.drag['op'] in ('resize', 'new')))
         if show_loupe:
             self._paint_loupe(snap, w, h)
         snap.pop()
@@ -813,7 +836,7 @@ class Canvas(Gtk.Widget):
         x1, y1 = min(bx + bw, sx + sw), min(by + bh, sy + sh)
         if x1 - x0 < 1 or y1 - y0 < 1:
             return
-        if a['kind'] in ('marker', 'mosaic'):
+        if a['kind'] in ('marker', 'mosaic') and s.cap.pixbuf is not None:
             # These depend on the pixels underneath, so preview them on the
             # real composite instead of a transparent layer.
             rect = (int(x0), int(y0), int(math.ceil(x1 - x0)), int(math.ceil(y1 - y0)))
@@ -978,6 +1001,8 @@ class OverlayWindow(Gtk.Window):
     def __init__(self, session, mon, gdk_monitor):
         super().__init__(application=session.app, title='glint-overlay', decorated=False)
         self.add_css_class('glint-overlay')
+        if session.backdrop:
+            self.add_css_class('shell-backdrop')
         self.session = session
         self.canvas = Canvas(session, mon)
         self.overlay = Gtk.Overlay(child=self.canvas)

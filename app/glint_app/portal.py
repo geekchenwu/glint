@@ -109,7 +109,7 @@ class ScreenshotPortal:
 
     def _error(self, error):
         print(f'glint: screenshot portal: {error}', flush=True)
-        note = Gio.Notification.new('Glint 截图未完成')
+        note = Gio.Notification.new('鹿门截图未完成')
         note.set_body('请允许系统的截图请求后重试。')
         self.app.send_notification('glint-portal', note)
 

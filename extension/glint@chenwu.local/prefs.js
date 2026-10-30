@@ -61,7 +61,7 @@ export default class GlintPreferences extends ExtensionPreferences {
         window.set_default_size(560, 720);
         window.set_search_enabled(false);
 
-        const page = new Adw.PreferencesPage({title: 'Glint', icon_name: 'io.github.glint.Glint-symbolic'});
+        const page = new Adw.PreferencesPage({title: '鹿门', icon_name: 'io.github.glint.Glint-symbolic'});
         window.add(page);
 
         // Header.
@@ -75,9 +75,9 @@ export default class GlintPreferences extends ExtensionPreferences {
         if (themeIcons.has_icon('io.github.glint.Glint'))
             icon.icon_name = 'io.github.glint.Glint';
         else
-            icon.gicon = Gio.icon_new_for_string(`${this.path}/icons/glint-symbolic.svg`);
+            icon.gicon = Gio.icon_new_for_string(`${this.path}/icons/glint.svg`);
         box.append(icon);
-        box.append(new Gtk.Label({label: 'Glint', css_classes: ['title-1']}));
+        box.append(new Gtk.Label({label: '鹿门 Lumen', css_classes: ['title-1']}));
         box.append(new Gtk.Label({
             label: '在 GNOME Shell 内部完成截图：零延迟，菜单与弹窗都能截到。',
             css_classes: ['dim-label'], wrap: true, justify: Gtk.Justification.CENTER,
@@ -115,10 +115,10 @@ export default class GlintPreferences extends ExtensionPreferences {
         if (glint) {
             const clash = new Adw.PreferencesGroup({
                 title: '快捷键冲突',
-                description: '其他截图工具（例如 Snipaste）的自定义快捷键会和 Glint 抢同一个键。',
+                description: '其他截图工具（例如 Snipaste）的自定义快捷键会和鹿门抢同一个键。',
             });
             const takeRow = new Adw.ActionRow({
-                title: '把冲突的快捷键交给 Glint',
+                title: '把冲突的快捷键交给鹿门',
                 subtitle: '停用占用相同按键的自定义快捷键，原设置会备份',
             });
             const restoreRow = new Adw.ActionRow({
@@ -150,7 +150,7 @@ export default class GlintPreferences extends ExtensionPreferences {
         // Appearance and files.
         const misc = new Adw.PreferencesGroup({title: '其他'});
         const indicator = new Adw.SwitchRow({
-            title: '顶栏图标', subtitle: '在顶栏显示 Glint 菜单',
+            title: '顶栏图标', subtitle: '在顶栏显示鹿门菜单',
         });
         settings.bind('show-indicator', indicator, 'active', Gio.SettingsBindFlags.DEFAULT);
         misc.add(indicator);
@@ -170,7 +170,7 @@ export default class GlintPreferences extends ExtensionPreferences {
         page.add(misc);
 
         const about = new Adw.PreferencesGroup({
-            title: '关于 Glint',
+            title: '关于鹿门',
             description: `版本 ${installedMetadata['version-name'] ?? installedMetadata.version}`,
         });
         const email = installedMetadata['contact-email'];

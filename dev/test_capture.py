@@ -13,7 +13,7 @@ gi.require_version('Gdk', '4.0')
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf, GLib
 
-from glint_app.render import Capture
+from glint_app.render import Capture, load_tiles, render_region
 
 
 class CaptureTests(unittest.TestCase):
@@ -60,6 +60,29 @@ class CaptureTests(unittest.TestCase):
         original.savev(self.path, 'png', [], [])
         capture = Capture(self.path, {})
         self.assertEqual(capture.pixels, original.get_pixels())
+
+    def test_pixels_follow_the_geometry(self):
+        original, meta = self.write_capture(False)
+        tiles = meta.pop('tiles')
+        capture = Capture(None, meta)
+        self.assertIsNone(capture.pixbuf)
+        self.assertEqual((capture.width, capture.height, capture.f), (1031, 1027, 2))
+        capture.set_pixbuf(load_tiles(self.path, capture.width, capture.height, tiles))
+        self.assertEqual(capture.pixels, original.add_alpha(False, 0, 0, 0).get_pixels())
+
+    def test_annotations_without_pixels_leave_the_frame_clear(self):
+        _original, meta = self.write_capture(False)
+        del meta['tiles']
+        anns = [{'kind': 'rect', 'x0': 10, 'y0': 10, 'x1': 50, 'y1': 50, 'width': 4, 'color': '#FF3D2E'},
+                {'kind': 'marker', 'points': [(10, 80), (90, 80)], 'width': 12, 'color': '#D7FF3C'},
+                {'kind': 'mosaic', 'x0': 60, 'y0': 10, 'x1': 90, 'y1': 50, 'block': 8}]
+        surface = render_region(Capture(None, meta), (0, 0, 100, 100), anns)
+        data, stride = surface.get_data(), surface.get_stride()
+        alpha = lambda x, y: data[y * stride + 4 * x + 3]  # noqa: E731
+        self.assertEqual(alpha(30, 30), 0)       # inside the rectangle
+        self.assertEqual(alpha(75, 30), 0)       # mosaic needs the pixels
+        self.assertEqual(alpha(10, 30), 255)     # rectangle stroke
+        self.assertIn(alpha(50, 80), range(100, 110))  # translucent marker
 
     def test_reject_truncated_tile(self):
         _original, meta = self.write_capture(True)

@@ -22,6 +22,9 @@ gschemas.compiled
 
 # Keep only the current, reviewed product screenshots in source control.
 /screenshots/*.png
-!/screenshots/logo-orange.png
-!/screenshots/selection-orange.png
-!/screenshots/about-orange.png
+!/screenshots/hero-dark.png
+!/screenshots/hero-light.png
+!/screenshots/shot-annotate.png
+!/screenshots/shot-detect.png
+!/screenshots/shot-pin.png
+!/screenshots/shot-prefs.png

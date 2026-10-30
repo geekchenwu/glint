@@ -1,4 +1,4 @@
-VERSION = '1.2.1'
+VERSION = '1.3.0'
 APP_ID = 'io.github.glint.Glint'
 DAEMON_PATH = '/io/github/glint/Glint/Daemon'
 DAEMON_IFACE = 'io.github.glint.Daemon'

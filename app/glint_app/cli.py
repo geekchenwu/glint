@@ -5,7 +5,7 @@ import time
 
 from . import APP_ID, DAEMON_IFACE, DAEMON_PATH, SHELL_IFACE, SHELL_PATH, VERSION
 
-USAGE = '''glint - 截图 / 标注 / 贴图
+USAGE = '''glint - 鹿门 Lumen：截图 / 标注 / 贴图
 
 用法:
   glint              启动常驻编辑器（通常由登录自启或扩展拉起）
@@ -14,8 +14,8 @@ USAGE = '''glint - 截图 / 标注 / 贴图
   glint pin          贴图（等同 F3）
   glint toggle-pins  隐藏 / 显示全部贴图（等同 Shift+F3）
   glint activate     安装后立即启用，无需立即注销桌面
-  glint setup        启用 GNOME 扩展，并把冲突的快捷键交给 Glint（会备份）
-  glint hotkeys restore   恢复被 Glint 接管前的快捷键
+  glint setup        启用 GNOME 扩展，并把冲突的快捷键交给鹿门（会备份）
+  glint hotkeys restore   恢复被鹿门接管前的快捷键
   glint --version
 '''
 COMMANDS = {
@@ -65,7 +65,7 @@ def _ensure_daemon():
         deadline = time.monotonic() + 8
         while not running():
             if process.poll() is not None or time.monotonic() >= deadline:
-                raise RuntimeError(f'Glint 编辑器未能启动，请查看 {runtime}/daemon.log')
+                raise RuntimeError(f'鹿门编辑器未能启动，请查看 {runtime}/daemon.log')
             time.sleep(.05)
     return bus
 
@@ -79,7 +79,7 @@ def _app_call(method, arg=None):
                       Gio.DBusCallFlags.NONE, 5000, None)
     except GLib.Error as error:
         if error.matches(Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD):
-            raise RuntimeError('旧版 Glint 仍在运行，请保存贴图后退出旧进程并重新打开 Glint。') from error
+            raise RuntimeError('旧版鹿门仍在运行，请保存贴图后退出旧进程并重新打开鹿门。') from error
         raise
 
 
@@ -121,8 +121,8 @@ def _setup(args):
     if args[0] == 'setup':
         status = firstrun.prepare_session()
         print({'enabled': 'GNOME 扩展：已启用',
-               'disabled': 'Glint：使用系统截图方式，可立即截图',
-               'unknown': 'Glint：使用系统截图方式，可立即截图；增强功能将在下次登录自动启用'}[status])
+               'disabled': '鹿门：使用系统截图方式，可立即截图',
+               'unknown': '鹿门：使用系统截图方式，可立即截图；增强功能将在下次登录自动启用'}[status])
     taken = firstrun.take_over()
     if firstrun.extension_status() != 'enabled':
         firstrun.install_fallback_shortcuts()
@@ -148,8 +148,8 @@ def main(argv):
         except Exception as error:
             print(f'glint: {error}', file=sys.stderr)
             return 1
-        print('Glint 已就绪，可从应用菜单打开并截图。' if status == 'enabled' else
-              'Glint 已就绪，可从应用菜单打开并截图。首次请允许系统截图请求，'
+        print('鹿门已就绪，可从应用菜单打开并截图。' if status == 'enabled' else
+              '鹿门已就绪，可从应用菜单打开并截图。首次请允许系统截图请求，'
               '增强功能将在下次正常登录启用（已手动禁用扩展时除外）。')
         if status != 'enabled' and firstrun.fallback_capture_binding():
             print(f'截图快捷键：{firstrun.fallback_capture_binding()}')
@@ -171,7 +171,7 @@ def main(argv):
     try:
         gi.require_foreign('cairo')
     except ImportError:
-        print('Glint 安装尚未完成：缺少 Cairo 绑定。请运行附带的 .run 安装器自动补齐依赖。',
+        print('鹿门安装尚未完成：缺少 Cairo 绑定。请运行附带的 .run 安装器自动补齐依赖。',
               file=sys.stderr)
         return 1
     from .main import run

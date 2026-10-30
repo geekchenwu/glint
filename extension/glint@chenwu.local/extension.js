@@ -4,9 +4,10 @@
 // (process start + portal round trip) and never see Shell popups, because
 // custom shortcuts are filtered while a menu holds its grab. Glint instead
 // grabs the stage from inside the compositor the moment the key is pressed,
-// freezes that frame on screen, and hands lossless image tiles to the resident
-// GTK editor. Wayland clients cannot keep themselves above other windows or
-// choose their position, so the extension does that for Glint's windows.
+// freezes that frame on screen and opens the resident GTK editor over it
+// straight away; lossless image tiles follow in the background. Wayland
+// clients cannot keep themselves above other windows or choose their
+// position, so the extension does that for Glint's windows.
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -84,6 +85,8 @@ export default class GlintExtension extends Extension {
         this._watched = new Map();
         this._busy = false;
         this._freeze = null;
+        this._frozen = null;
+        this._encoding = null;
         this._freezeTimeoutId = 0;
         // Only talk to the editor installed alongside this extension:
         // <share>/gnome-shell/extensions/<uuid> pairs with <share>/glint, which
@@ -140,6 +143,8 @@ export default class GlintExtension extends Extension {
         this._indicator?.destroy();
         this._indicator = null;
 
+        this._encoding?.cancel();
+        this._frozen = null;
         this._hideFreeze();
         this._virtualPointer = null;
         this._virtualKeyboard = null;
@@ -154,6 +159,8 @@ export default class GlintExtension extends Extension {
             return;
         this._busy = true;
         const t0 = nowUs();
+        this._captureStart = t0;
+        const encoding = new Gio.Cancellable();
         let path = null;
         try {
             const shooter = new Shell.Screenshot();
@@ -161,45 +168,66 @@ export default class GlintExtension extends Extension {
             const tGrab = nowUs();
 
             // Collect geometry before anything on screen changes.
-            const meta = this._collectMeta(content.get_texture());
+            const texture = content.get_texture();
+            const meta = this._collectMeta(texture);
             const popups = this._clientPopups();
+            this._frozen = content;
             this._showFreeze(content);
+            const unfrozen = new Promise(resolve => this._freeze.connect('destroy', resolve));
             this._dismissShellPopups();
             // An open client menu keeps the pointer grabbed and would swallow
             // the first drag in the editor. Close it under the frozen frame,
             // and wait for it so the Escape cannot reach the editor instead.
-            const popupsGone = this._dismissClientPopups(popups);
+            await this._dismissClientPopups(popups);
+
+            // The editor opens over the frozen frame right away (see
+            // _attachBackdrop); it needs the pixels only for the loupe and the
+            // result, so they are encoded while it is already in use.
+            this._encoding = encoding;
+            await this._callApp('Begin', new GLib.Variant('(ss)', [mode, JSON.stringify(meta)]));
+            const tBegin = nowUs();
+            // Reading tiles back blocks this thread, and the editor's first
+            // frame needs it: present() makes round trips to the compositor.
+            // Start once that frame is on screen (or the editor is gone).
+            await unfrozen;
+            await new Promise(resolve => this._once(global.stage, 'after-paint', resolve));
+            const tShown = nowUs();
 
             path = GLib.build_filenamev([this._captureDir,
                 `capture-${GLib.get_real_time()}.tiles`]);
-            meta.tiles = await this._writeCapture(content.get_texture(), path);
-            meta.version = 2;
+            const tiles = await this._writeCapture(texture, path, encoding);
             const tEncode = nowUs();
-
-            await popupsGone;
-            meta.timing = {grabMs: (tGrab - t0) / 1000, encodeMs: (tEncode - tGrab) / 1000};
-            await this._callApp('Capture',
-                new GLib.Variant('(sss)', [mode, path, JSON.stringify(meta)]));
-            console.log(`glint: capture grab ${meta.timing.grabMs.toFixed(1)} ms, ` +
-                `encode ${meta.timing.encodeMs.toFixed(1)} ms, ` +
-                `handoff ${((nowUs() - tEncode) / 1000).toFixed(1)} ms`);
+            await this._callApp('Pixels',
+                new GLib.Variant('(ss)', [path, JSON.stringify({tiles, start: t0})]));
+            const ms = us => (us / 1000).toFixed(1);
+            console.log(`glint: capture grab ${ms(tGrab - t0)} ms, begin ${ms(tBegin - tGrab)} ms, ` +
+                `shown ${ms(tShown - t0)} ms, encode ${ms(tEncode - tShown)} ms, ` +
+                `pixels sent ${ms(nowUs() - t0)} ms after F1`);
         } catch (e) {
             if (path) {
                 try {
                     Gio.File.new_for_path(path).delete(null);
                 } catch {
-                    // The editor may already have consumed the capture.
+                    // Not written yet, or the editor already consumed it.
                 }
             }
-            this._hideFreeze();
-            logError(e, 'glint: capture failed');
-            Main.notifyError('Glint', `截图失败：${e.message}`);
+            // Cancelled means the editor was closed before the pixels were done.
+            if (!e.matches?.(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) {
+                this._hideFreeze();
+                this._frozen = null;
+                // The editor cannot finish without the pixels.
+                for (const win of this._overlays)
+                    win.delete(global.get_current_time());
+                logError(e, 'glint: capture failed');
+                Main.notifyError('鹿门', `截图失败：${e.message}`);
+            }
         } finally {
+            this._encoding = null;
             this._busy = false;
         }
     }
 
-    async _writeCapture(texture, path) {
+    async _writeCapture(texture, path, cancellable) {
         const width = texture.get_width();
         const height = texture.get_height();
         const tiles = [];
@@ -213,22 +241,31 @@ export default class GlintExtension extends Extension {
             }
         }
 
-        // Shell's PNG encoder has no compression setting. Small lossless
-        // tiles let its worker pool encode in parallel instead of holding
-        // up selection on one full-desktop PNG.
+        // Shell's PNG encoder has no compression setting, and gdk-pixbuf
+        // runs one PNG save at a time, so two tiles in flight are enough:
+        // one compressing on a worker thread while the next is read back.
+        // Reading a 1024 px tile back blocks the main thread for ~15 ms, so
+        // each waits for an idle moment and the editor's frames come first.
+        // Closing the editor cancels; then the tile in flight is not waited
+        // for either, so the next capture can start right away.
+        const stopped = new Promise(resolve => cancellable.connect(resolve));
         const encoded = new Array(tiles.length);
         let next = 0;
-        const workers = Array.from({length: Math.min(8, tiles.length)}, async () => {
+        const workers = Array.from({length: Math.min(2, tiles.length)}, async () => {
             while (next < tiles.length) {
                 const i = next++;
                 const tile = tiles[i];
+                await new Promise(resolve => GLib.idle_add(GLib.PRIORITY_LOW, () => {
+                    resolve();
+                    return GLib.SOURCE_REMOVE;
+                }));
+                cancellable.set_error_if_cancelled();
                 const buffer = Gio.MemoryOutputStream.new_resizable();
-                try {
-                    await Shell.Screenshot.composite_to_stream(texture,
-                        tile.x, tile.y, tile.width, tile.height, 1, null, 0, 0, 1, buffer);
-                } finally {
-                    buffer.close(null);
-                }
+                const done = Shell.Screenshot.composite_to_stream(texture,
+                    tile.x, tile.y, tile.width, tile.height, 1, null, 0, 0, 1, buffer)
+                    .finally(() => buffer.close(null));
+                await Promise.race([done, stopped]);
+                cancellable.set_error_if_cancelled();
                 encoded[i] = buffer.steal_as_bytes();
                 tile.length = encoded[i].get_size();
             }
@@ -452,7 +489,7 @@ export default class GlintExtension extends Extension {
                 }, null);
             timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, timeoutMs, () => {
                 Gio.bus_unwatch_name(watchId);
-                reject(new Error('Glint 编辑器未能启动'));
+                reject(new Error('鹿门编辑器未能启动'));
                 return GLib.SOURCE_REMOVE;
             });
         });
@@ -497,7 +534,13 @@ export default class GlintExtension extends Extension {
             for (const id of ids)
                 win.disconnect(id);
             this._watched?.delete(win);
-            this._overlays?.delete(win);
+            if (this._overlays?.delete(win) && this._overlays.size === 0) {
+                // The editor is gone: stop encoding pixels nobody will read,
+                // and drop the frozen frame if it closed before showing.
+                this._encoding?.cancel();
+                this._frozen = null;
+                this._hideFreeze();
+            }
         }));
         this._watched.set(win, ids);
         check();
@@ -520,11 +563,14 @@ export default class GlintExtension extends Extension {
             Main.wm.skipNextEffect(actor);
             const id = actor.connect('first-frame', () => {
                 actor.disconnect(id);
+                if (this._frozen)
+                    this._attachBackdrop(win, actor);
                 // Wait for the frame to actually reach the screen.
                 GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
                     if (this._overlays?.has(win)) {
                         win.make_above();
                         this._hideFreeze();
+                        this._logShown();
                     }
                     return GLib.SOURCE_REMOVE;
                 });
@@ -562,6 +608,29 @@ export default class GlintExtension extends Extension {
         });
     }
 
+    // The editor's overlay is transparent and the frozen frame is painted
+    // under its surface, inside its window actor: it stacks with the window,
+    // and the editor never has to wait for, or upload, the pixels to show it.
+    // Right under the surface, as Mutter backs fullscreen windows that are
+    // not opaque with black.
+    _attachBackdrop(win, actor) {
+        const {width, height} = global.stage;
+        const [x, y] = actor.get_position();
+        const area = win.get_frame_rect();
+        const backdrop = new Clutter.Actor({content: this._frozen, x: -x, y: -y, width, height});
+        backdrop.set_clip(area.x, area.y, area.width, area.height);
+        actor.insert_child_below(backdrop, actor.get_last_child());
+    }
+
+    // F1-to-selection latency: the first stage paint that shows the editor.
+    _logShown() {
+        const start = this._captureStart;
+        this._captureStart = 0;
+        if (start)
+            this._once(global.stage, 'after-paint', () => console.log(
+                `glint: selection shown ${((nowUs() - start) / 1000).toFixed(1)} ms after F1`));
+    }
+
     // ---- indicator -----------------------------------------------------
 
     _syncIndicator() {
@@ -576,11 +645,25 @@ export default class GlintExtension extends Extension {
     }
 
     _buildIndicator() {
-        const button = new PanelMenu.Button(0.5, 'Glint', false);
-        button.add_child(new St.Icon({
-            gicon: Gio.icon_new_for_string(`${this.path}/icons/glint-symbolic.svg`),
+        const button = new PanelMenu.Button(0.5, '鹿门', false);
+        const icon = new St.Icon({
+            gicon: Gio.icon_new_for_string(`${this.path}/icons/glint.svg`),
             style_class: 'system-status-icon',
-        }));
+        });
+        // Ubuntu's AppIndicator extension can enlarge tray icons and, in compact
+        // mode, tighten their buttons; copy its size and spacing so this icon
+        // and its highlight match the tray icons beside it.
+        const tray = Gio.SettingsSchemaSource.get_default()
+            .lookup('org.gnome.shell.extensions.appindicator', true);
+        if (tray) {
+            const settings = new Gio.Settings({settings_schema: tray});
+            const compact = settings.get_boolean('compact-mode-enabled');
+            icon.icon_size = settings.get_int('icon-size');
+            icon.set_style(compact ? 'padding: 0; margin: 0' : 'padding: 0');
+            if (compact)
+                button.set_style('-natural-hpadding: 10px');
+        }
+        button.add_child(icon);
 
         const accel = key => {
             const value = this._settings.get_strv(key)[0] ?? '';

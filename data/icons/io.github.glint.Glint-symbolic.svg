@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <g fill="none" stroke="#2E3436" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="round">
-    <path d="M9 2.5H5A2.5 2.5 0 0 0 2.5 5v6A2.5 2.5 0 0 0 5 13.5h6a2.5 2.5 0 0 0 2.5-2.5V8H8.5"/>
-    <path d="M12 2.5h1.5V4"/>
+  <!-- Chiying: viewfinder corners around a broken bagua ring and seal dot. -->
+  <defs>
+    <path id="tri" d="M6.19 2.20 9.81 2.20 9.14 3.80 6.86 3.80Z"/>
+  </defs>
+  <g fill="#2E3436">
+    <use href="#tri"/>
+    <use href="#tri" transform="rotate(45 8 8)"/>
+    <use href="#tri" transform="rotate(90 8 8)"/>
+    <use href="#tri" transform="rotate(135 8 8)"/>
+    <use href="#tri" transform="rotate(180 8 8)"/>
+    <use href="#tri" transform="rotate(225 8 8)"/>
+    <use href="#tri" transform="rotate(270 8 8)"/>
+    <use href="#tri" transform="rotate(315 8 8)"/>
+    <circle cx="8" cy="8" r="2.3"/>
   </g>
+  <path d="M1.3 4.5V1.3H4.5M11.5 1.3H14.7V4.5M14.7 11.5V14.7H11.5M4.5 14.7H1.3V11.5" fill="none" stroke="#2E3436" stroke-width="1.6"/>
 </svg>

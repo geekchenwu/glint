@@ -1,5 +1,5 @@
 #!/bin/sh
-# Glint @VERSION@ installer. Dependencies are resolved by APT before setup.
+# Lumen @VERSION@ installer. Dependencies are resolved by APT before setup.
 set -eu
 
 case "${1:-}" in
@@ -14,7 +14,7 @@ work=$(mktemp -d "${TMPDIR:-/tmp}/glint-installer.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 package="$work/glint_@VERSION@_all.deb"
 payload=$(awk '/^__GLINT_DEB_PAYLOAD__$/ { print NR + 1; exit }' "$script")
-[ -n "$payload" ] || { echo "Incomplete Glint installer." >&2; exit 1; }
+[ -n "$payload" ] || { echo "Incomplete Lumen installer." >&2; exit 1; }
 tail -n +"$payload" "$script" | base64 --decode > "$package"
 printf '%s  %s\n' '@SHA256@' "$package" | sha256sum --check --status
 dpkg-deb --info "$package" >/dev/null
@@ -39,7 +39,7 @@ fi
 # APT's unprivileged downloader must be able to read this public package.
 chmod 755 "$work"
 chmod 644 "$package"
-echo "Installing Glint @VERSION@ and its required dependencies..."
+echo "Installing Lumen @VERSION@ and its required dependencies..."
 if [ "$(id -u)" -eq 0 ]; then
   /usr/bin/apt-get -y --no-remove -o DPkg::Lock::Timeout=60 install "$package"
 elif command -v pkexec >/dev/null 2>&1 && [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
@@ -51,7 +51,7 @@ fi
 if [ "$(id -u)" -ne 0 ] && [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   /usr/share/glint/glint activate
 else
-  echo "Glint is installed. Open Glint from the applications menu to start."
+  echo "Lumen is installed. Open Lumen from the applications menu to start."
 fi
 exit 0
 __GLINT_DEB_PAYLOAD__
